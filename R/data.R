@@ -17,7 +17,7 @@
 #'   \item{transition}{Transition type: direct, indirect, etc.}
 #'   \item{pH}{The pH at which the reported CB/VB occurs.}
 #'   \item{pH.ZPC}{The pH at which the material's surface is neutral.}
-#'   \item{ref}{Bibtex reference key. See citations in /data-raw/references.bib.}
+#'   \item{ref}{Bibtex reference key. See bib-file in /vignettes/references.bib}
 #'   \item{comment}{Free-form comment.}
 #' }
 #' @author Taha Ahmed

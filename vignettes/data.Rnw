@@ -1,0 +1,239 @@
+%\VignetteIndexEntry{Absolute Band Energies and Band Gaps}
+% \VignetteEngine{knitr::knitr}
+%\VignetteKeyword{LaTeX}
+%\VignetteKeyword{bandgaps}
+%\VignetteKeyword{semiconductors}
+
+
+\documentclass[a4paper]{article}
+
+% ----------------------------------------------------------------------
+% Page layout
+% ----------------------------------------------------------------------
+\usepackage[%
+   left=1.5cm,
+   right=1.5cm,
+   top=1.785cm,
+   bottom=2.0cm]%
+{geometry}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% bibliography
+% ----------------------------------------------------------------------
+\usepackage[%
+   backend=biber,
+   doi=true]%
+{biblatex}
+% add DOIs in reference list
+\newcommand*\doiformat[1]{\small#1}
+\DeclareFieldFormat{doi}{%
+   \mkbibacro{\small{DOI}}\addcolon\space
+   \ifhyperref{%
+      \href{https://dx.doi.org/#1}{\doiformat{#1}}%
+   }{%
+      \doiformat{#1}%
+   }%
+}
+\addbibresource{references.bib}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Fonts and symbols
+% ----------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{textcomp} % \textdegree, \textmu, \texttrademark
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - general
+% ----------------------------------------------------------------------
+\usepackage{gitinfo2}
+% \usepackage{fancyhdr}
+%    \pagestyle{fancy}
+\usepackage{csquotes}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - graphics, captions, footnotes, etc.
+% ----------------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage[%
+   format=plain,
+   justification=justified,
+   singlelinecheck=false,
+   font={stretch=1.125,small,sf},
+   labelfont=bf,
+   labelsep=space]%
+{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+% \usepackage{rotating} % rotate full-page floats
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - tables, lists
+% ----------------------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage[inline]{enumitem} % control layout of lists
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - chemistry, science
+% ----------------------------------------------------------------------
+\usepackage{amssymb} %\geqslant, %\leqslant
+\usepackage{chemformula}
+   \setchemformula{charge-style=math}
+\usepackage{siunitx}
+   \sisetup{load-configurations=abbreviations,
+            separate-uncertainty,
+            detect-family,
+            range-phrase=\ensuremath{\text{ to }}}
+   \DeclareSIUnit{\counts}{cts}
+   \DeclareSIUnit{\cps}{cps}
+   \DeclareSIUnit{\molar}{\mole\per\cubic\deci\metre}
+   \DeclareSIUnit{\Molar}{\textsc{m}}
+   \DeclareSIUnit{\voltAgCl}{\volt~vs.\ \ch{Ag}/\ch{AgCl}}
+   \DeclareSIUnit{\voltNHE}{\volt~vs.\ NHE}
+   \DeclareSIUnit{\voltSHE}{\volt~vs.\ SHE}
+   \DeclareSIUnit{\voltSCE}{\volt~vs.\ SCE}
+   \DeclareSIUnit{\voltLi}{\volt~vs.\ \ch{Li}/\ch{Li+}}
+   \DeclareSIUnit{\rpm}{rpm}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Packages that need to be called last: hyperref, cleveref etc.
+% ----------------------------------------------------------------------
+\usepackage[%
+   pdfkeywords={Semiconductors Band gaps Conduction Band Valence Band Data},%
+	pdfauthor={Collected by Taha Ahmed, Uppsala university},%
+	pdftitle={Absolute band energies and band gaps},%
+	pdfsubject={Photoelectrochemistry},%
+	pdftex]%
+{hyperref}
+\usepackage[nameinlink]{cleveref}
+% ----------------------------------------------------------------------
+
+
+% ----------------------------------------------------------------------
+% R SETUP
+% ----------------------------------------------------------------------
+<<'R-setup', echo=F, results='hide', cache=FALSE>>=
+options(tikzDefaultEngine = "pdftex",
+        "tikzLatexPackages" =
+           c("\\usepackage{tikz}\n",
+             "\\usepackage[active,tightpage,psfixbb]{preview}\n",
+             "\\PreviewEnvironment{pgfpicture}\n",
+             "\\setlength\\PreviewBorder{0pt}\n",
+             "\\usepackage{chemformula}\n",
+             "\\setchemformula{charge-style=math}\n",
+             "\\usepackage{siunitx}\n",
+             "\\sisetup{load-configurations=abbreviations,separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+             "\\DeclareSIUnit{\\counts}{cts}\n",
+             "\\DeclareSIUnit{\\cps}{cps}\n",
+             "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
+             "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
+             "\\DeclareSIUnit{\\voltAgCl}{\\volt~vs.\\ \\ce{Ag}/\\ce{AgCl}}\n",
+             "\\DeclareSIUnit{\\voltNHE}{\\volt~vs.\\ NHE}\n",
+             "\\DeclareSIUnit{\\voltSHE}{\\volt~vs.\\ SHE}\n",
+             "\\DeclareSIUnit{\\voltSCE}{\\volt~vs.\\ SCE}\n",
+             "\\DeclareSIUnit{\\voltLi}{\\volt~vs.\\ \\ch{Li}/\\ch{Li+}}\n",
+             "\\DeclareSIUnit{\\rpm}{rpm}\n"),
+   digits   = 7,
+   width    = 84,
+   continue = "  ",
+   prompt   = "> ",
+   stringsAsFactors = FALSE)
+@
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% R LOAD PACKAGES
+% ----------------------------------------------------------------------
+<<'load-R-packages', echo=F, results='hide', message=FALSE>>=
+# packages here should also be listed in DESCRIPTION
+library(common)
+# library(bandgaps)
+library(git2r)
+   repo <- repository("/media/bay/taha/chepec/chetex/common/R/bandgaps")
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+library(xtable)
+library(knitr)
+opts_knit$set(self.contained = FALSE,
+              child.path = '')
+opts_chunk$set(dev = 'tikz',
+               # external = TRUE only takes effect when tikz is the ONLY dev option
+               external = TRUE,
+               cache = TRUE,
+               fig.width = 3.40, # 2.60,
+               # corresponding height based on golden ratio (1.618034):
+               # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
+               # W 5.51 ==> H 3.41
+               # W 7.48 ==> H 4.62 >> works better >> W 5.40, H 3.34
+               fig.height = 2.10, # 1.61,
+               out.width = '3.40in', # '2.60in',
+               fig.align = 'center',
+               # size affects all knitr output. We use it primarily
+               # to match knitr font size to figure captions
+               size = 'footnotesize',
+               echo = FALSE,
+               eval = TRUE,
+               results = 'hide',
+               message = FALSE,
+               tidy = FALSE)
+@
+% ----------------------------------------------------------------------
+
+
+\begin{document}
+
+Testing testing.
+\textcite{Xu2000}.
+
+
+\printbibliography
+
+
+\clearpage
+%%%%% TikZ box displaying commit history, R session info, and LaTeX version info
+\begin{tikzpicture}[remember picture, overlay]%
+\node (gitbox) at (current page.north east)
+   [xshift=-2cm, yshift=-2cm, text width=10cm, fill=blue!40, below left, font=\sffamily\small\color{white}]%
+{\raggedright\bfseries%
+Source: \texttt{\jobname.Rnw}\\%
+git refs: \texttt{\gitReferences}\\%
+git hash: \texttt{\gitHash}\\%
+git author: \gitAuthorName\\%
+author email: \gitAuthorEmail\\%
+commit date: \gitAuthorIsoDate\\%
+compile date: \Sexpr{Sys.time()}};%
+\node (gitRbox) at (gitbox.south west) [yshift=0.35cm, text width=10cm, below right, font=\sffamily\small]%
+{%
+<<'gitR-info', echo=FALSE, results='markup', cache=FALSE>>=
+status(repo)
+@
+};%
+\node (Rbox) at (gitRbox.south west) [fill=blue!20, text width=10cm, below right, font=\sffamily\small]%
+{%
+<<'R-session-info', echo=FALSE, results='asis', cache=FALSE>>=
+toLatex(sessionInfo(), locale=F)
+@
+};%
+\node (LaTeXbox) at (Rbox.south west) [yshift=-0.10cm, fill=blue!10, text width=10cm, below right, font=\sffamily\small]%
+{%
+<<'pdflatex-version', echo=FALSE, results='asis'>>=
+latex.version.text <- system(command = "pdflatex -version", intern = TRUE)
+# quick fixes: replace "\o" with "o", and remove all empty rows in latex.version.text
+cat(paste0("\\noindent\n", paste(sub("\\\\o", "o", latex.version.text[which(latex.version.text != "")]), collapse = "\\\\\n")))
+@
+};%
+\end{tikzpicture}%
+%%%%%
+
+
+\end{document}
+

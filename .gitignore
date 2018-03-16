@@ -2,5 +2,15 @@
 .Rhistory
 .RData
 .Ruserdata
-.latexmkrc
-.knitme
+inst/doc
+vignettes/*/
+vignettes/*.aux
+vignettes/*.bbl
+vignettes/*.bcf
+vignettes/*.blg
+vignettes/*.log
+vignettes/*.out
+vignettes/*.run.xml
+vignettes/*.tex
+vignettes/knitr.sty
+
