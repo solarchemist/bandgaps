@@ -1,7 +1,7 @@
 Package: bandgaps
 Type: Package
 Title: Band Energies of Some Semiconductors
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Author: Taha Ahmed <taha@chepec.se>
 Maintainer: Taha Ahmed <taha@chepec.se>
 Suggests: knitr,

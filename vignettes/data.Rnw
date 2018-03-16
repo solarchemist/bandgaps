@@ -11,8 +11,8 @@
 % Page layout
 % ----------------------------------------------------------------------
 \usepackage[%
-   left=1.5cm,
-   right=1.5cm,
+   left=2.0cm,
+   right=2.0cm,
    top=1.785cm,
    bottom=2.0cm]%
 {geometry}
@@ -23,6 +23,7 @@
 % ----------------------------------------------------------------------
 \usepackage[%
    backend=biber,
+   url=false,
    doi=true]%
 {biblatex}
 % add DOIs in reference list
@@ -53,6 +54,8 @@
 % \usepackage{fancyhdr}
 %    \pagestyle{fancy}
 \usepackage{csquotes}
+% used by setstretch{} later in the preamble
+\usepackage{setspace}
 % ----------------------------------------------------------------------
 
 % ----------------------------------------------------------------------
@@ -63,7 +66,7 @@
    format=plain,
    justification=justified,
    singlelinecheck=false,
-   font={stretch=1.125,small,sf},
+   font={stretch=1.125,small},
    labelfont=bf,
    labelsep=space]%
 {caption}
@@ -95,11 +98,11 @@
    \DeclareSIUnit{\cps}{cps}
    \DeclareSIUnit{\molar}{\mole\per\cubic\deci\metre}
    \DeclareSIUnit{\Molar}{\textsc{m}}
-   \DeclareSIUnit{\voltAgCl}{\volt~vs.\ \ch{Ag}/\ch{AgCl}}
-   \DeclareSIUnit{\voltNHE}{\volt~vs.\ NHE}
-   \DeclareSIUnit{\voltSHE}{\volt~vs.\ SHE}
-   \DeclareSIUnit{\voltSCE}{\volt~vs.\ SCE}
-   \DeclareSIUnit{\voltLi}{\volt~vs.\ \ch{Li}/\ch{Li+}}
+   \DeclareSIUnit{\voltAgCl}{\volt(\ch{Ag}/\ch{AgCl})}
+   \DeclareSIUnit{\voltNHE}{\volt(NHE)}
+   \DeclareSIUnit{\voltSHE}{\volt(SHE)}
+   \DeclareSIUnit{\voltSCE}{\volt(SCE)}
+   \DeclareSIUnit{\voltLi}{\volt(\ch{Li}/\ch{Li+})}
    \DeclareSIUnit{\rpm}{rpm}
 % ----------------------------------------------------------------------
 
@@ -115,6 +118,10 @@
 {hyperref}
 \usepackage[nameinlink]{cleveref}
 % ----------------------------------------------------------------------
+
+\title{Rendering all semiconductor \texttt{bandgaps} as a \LaTeX\ table}
+\date{\today}
+\author{Taha Ahmed}
 
 
 % ----------------------------------------------------------------------
@@ -153,9 +160,9 @@ options(tikzDefaultEngine = "pdftex",
 % R LOAD PACKAGES
 % ----------------------------------------------------------------------
 <<'load-R-packages', echo=F, results='hide', message=FALSE>>=
-# packages here should also be listed in DESCRIPTION
+library(bandgaps)
+# packages listed below should also be listed in DESCRIPTION
 library(common)
-# library(bandgaps)
 library(git2r)
    repo <- repository("/media/bay/taha/chepec/chetex/common/R/bandgaps")
 library(ggplot2)
@@ -168,7 +175,7 @@ opts_knit$set(self.contained = FALSE,
 opts_chunk$set(dev = 'tikz',
                # external = TRUE only takes effect when tikz is the ONLY dev option
                external = TRUE,
-               cache = TRUE,
+               cache = FALSE,
                fig.width = 3.40, # 2.60,
                # corresponding height based on golden ratio (1.618034):
                # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
@@ -189,13 +196,162 @@ opts_chunk$set(dev = 'tikz',
 % ----------------------------------------------------------------------
 
 
+\setlength\parindent{0pt}
 \begin{document}
+\maketitle
 
-Testing testing.
-\textcite{Xu2000}.
+Here we display the data in \texttt{bandgaps::semiconductors} as a table (see \cref{tab:semiconductors-asis}). To make the rendered table look nice, we will compress some columns and put any comments into tabular footnotes, but we will include all the data in the \texttt{bandgaps} dataset.
+
+<<'comments-to-footnotes'>>=
+comments <- unique(semiconductors$comment)
+# Count existing comments and remove empty comments
+k <- 0
+tmp.comments <- character()
+for (j in 1:length(comments)) {
+   if (comments[j] != "") {
+      k <- k + 1
+      tmp.comments[k] <- comments[j]
+   }
+}
+# Reset comments
+comments <- tmp.comments
+# Find their original positions in the semiconductors dataframe
+unique.comment.positions <- list()
+for (j in 1:length(comments)) {
+   unique.comment.positions[[j]] <- which(semiconductors$comment == comments[j])
+}
+## create-footnotemarks
+footnotemark <- rep.int(NA, dim(semiconductors)[1])
+for (j in 1:length(unique.comment.positions)) {
+   footnotemark[unique.comment.positions[[j]]] <- j
+}
+@
+
+We will render the table using \texttt{xtable} (that chunk is shown at the end of this document).
+
+<<'tab-semiconductors-asis', results='asis'>>=
+xtab.semiconductors <-
+   semiconductors %>%
+   mutate(formula =
+             ifelse(semiconductors$polymorph == "",
+                    paste0(ifelse(semiconductors$sctype == "",
+                                  "",
+                                  paste0("$", semiconductors$sctype, "$-")),
+                           "\\ch{", semiconductors$formula, "}"),
+                    paste0(ifelse(semiconductors$sctype == "",
+                                  "",
+                                  paste0("$", semiconductors$sctype, "$-")),
+                           "\\ch{", semiconductors$formula, "} ", "(", semiconductors$polymorph, ")"))) %>%
+   mutate(pH =
+             ifelse(is.na(semiconductors$pH),
+                    "\\multicolumn{1}{c}{\\texttt{NA}}",
+                    semiconductors$pH)) %>%
+   mutate(pH.ZPC =
+             ifelse(is.na(semiconductors$pH.ZPC),
+                    "\\multicolumn{1}{c}{\\texttt{NA}}",
+                    semiconductors$pH.ZPC)) %>%
+   mutate(ref =
+             ifelse(semiconductors$ref == "",
+                    "",
+                    paste0("\\cite{", semiconductors$ref, "}"))) %>%
+   mutate(footnotemark =
+             ifelse(is.na(footnotemark),
+                    "",
+                    paste0("$^{", footnotemark, "}$"))) %>%
+   select(formula, class, CB, VB, Eg, pH, pH.ZPC, ref, footnotemark) %>%
+   xtable()
+caption(xtab.semiconductors) <-
+   paste("Band edge levels at the pH of ZPC for each material.",
+         "All band edge potentials vs SHE.")
+label(xtab.semiconductors) <- "tab:semiconductors-asis"
+names(xtab.semiconductors) <-
+ c("{Formula}",
+   "{Class}",
+   "{$E_\\text{CB}$/\\si{\\voltSHE}}",
+   "{$E_\\text{VB}$/\\si{\\voltSHE}}",
+   "{$E_\\text{g}$/\\si{\\volt}}",
+   "{pH}",
+   "{pH$_\\text{ZPC}$}",
+   "{Ref}",
+   "{Note}")
+digits(xtab.semiconductors) <-
+ c(0, #row.names
+   0, #formula
+   0, #class
+   2, #CB
+   2, #VB
+   2, #Eg
+   2, #pH
+   2, #pH.ZPC
+   0, #Refs
+   0) #Notes
+display(xtab.semiconductors) <-
+ c("s", #row.names
+   "s", #formula
+   "s", #class
+   "f", #CB
+   "f", #VB
+   "f", #Eg
+   "f", #pH
+   "f", #pH.ZPC
+   "s", #Refs
+   "s") #Notes
+align(xtab.semiconductors) <-
+ c("l",                    #row.names
+   "l",                    #formula
+   "l",                    #class
+   "S[table-format=+1.2]", #CB
+   "S[table-format=+1.2]", #VB
+   "S[table-format=+1.2]", #Eg
+   "S[table-format=1.2]",  #pH
+   "S[table-format=1.2]",  #pH.ZPC
+   "c",                    #Refs
+   "l")                    #Notes
+## create-latex-footnotetexts
+footnotetext <- comments
+# add numbering to each footnote
+for (j in 1:length(comments)) {
+   footnotetext[j] <-
+      paste0("\\multicolumn{", dim(xtab.semiconductors)[2],
+             "}{l}{", "$^{", j, "}$ ", comments[j], "}",
+             ifelse(j == length(comments),
+                    "\n",
+                    "\\\\"))
+}
+print(xtab.semiconductors,
+      floating = TRUE,
+      floating.environment = "table",
+      table.placement = "tbp",
+      caption.placement = "top",
+      hline.after = NULL,
+      add.to.row = list(pos = list(-1,
+                                   0,
+                                   nrow(xtab.semiconductors),
+                                   nrow(xtab.semiconductors)),
+                        command = c("\\toprule\n",
+                                    "\\midrule\n",
+                                    "\\bottomrule\n",
+                                    paste(footnotetext, collapse = "\n"))),
+      include.rownames = FALSE,
+      include.colnames = TRUE,
+      type = "latex",
+      tabular.environment = "tabular",
+      latex.environments = c("center", "small"),
+      # note: env small affects the table and footnotetext, but not the caption
+      sanitize.text.function = function(x){x},
+      math.style.negative = FALSE)
+@
 
 
 \printbibliography
+
+
+\clearpage
+\section*{\texttt{xtable} code chunk}
+
+<<'print-tab-semiconductors-asis', ref.label='tab-semiconductors-asis', eval=FALSE, echo=TRUE>>=
+@
+
 
 
 \clearpage
