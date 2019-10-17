@@ -6,7 +6,8 @@
 \usage{
 semiconductor_row(formula, polymorph = "", xtal.size = "bulk",
   sctype = "", class = "", CB = NA, VB = NA, Eg = NA,
-  transition = "", pH = NA, pH.ZPC = NA, ref, comment = "")
+  transition = "", pH = NA, pH.ZPC = NA, Nernstian = "", ref,
+  comment = "")
 }
 \arguments{
 \item{formula}{mandatory. The compound's chemical formula.}
@@ -31,7 +32,9 @@ semiconductor_row(formula, polymorph = "", xtal.size = "bulk",
 
 \item{pH.ZPC}{optional. pH at which surface charge is neutral.}
 
-\item{ref}{mandatory. BibTeX reference string.}
+\item{Nernstian}{optional. Is set to TRUE if given explicitly, else set to FALSE. Except if class is oxide then set to TRUE regardless.}
+
+\item{ref}{mandatory. BibTeX reference string. Separate multiple refs with commas.}
 
 \item{comment}{optional.}
 }
@@ -39,11 +42,12 @@ semiconductor_row(formula, polymorph = "", xtal.size = "bulk",
 single-row dataframe ready to be incorporated into a semiconductors dataframe
 }
 \description{
-IMPORTANT: always specify CB/VB potentials vs SHE.
-May I suggest you use \code{\link[common]{as.SHE}} for this purpose.
+IMPORTANT: always use SHE scale for all potentials.
+May I suggest you use \code{\link[refelectrodes]{as.SHE}} for this purpose.
 }
 \examples{
 \dontrun{
-semiconductor_row(formula="CdS", CB=common::as.SHE(-3.98, "AVS"), Eg=2.40, pH=2.00, ref="Xu2000")
+semiconductor_row(formula="CdS", CB=refelectrodes::as.SHE(-3.98, "AVS"),
+                  Eg=2.40, pH=2.00, ref="Xu2000")
 }
 }

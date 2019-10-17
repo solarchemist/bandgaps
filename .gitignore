@@ -13,4 +13,5 @@ vignettes/*.out
 vignettes/*.run.xml
 vignettes/*.tex
 vignettes/knitr.sty
-
+Meta
+!doc

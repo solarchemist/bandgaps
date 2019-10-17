@@ -27,12 +27,12 @@ options(tikzDefaultEngine = "pdftex",
 
 ## ----'load-R-packages', echo=F, results='hide', message=FALSE---------------------
 library(bandgaps)
+library(refelectrodes)
 # packages listed below should also be listed in DESCRIPTION
+library(here)
 library(common)
 library(git2r)
-   repo <- repository("/media/bay/taha/chepec/chetex/common/R/bandgaps")
-library(ggplot2)
-library(magrittr)
+   repo <- repository(here())
 library(dplyr)
 library(xtable)
 library(knitr)
@@ -77,10 +77,15 @@ unique.comment.positions <- list()
 for (j in 1:length(comments)) {
    unique.comment.positions[[j]] <- which(semiconductors$comment == comments[j])
 }
-## create-footnotemarks
+## create footnotemarks
 footnotemark <- rep.int(NA, dim(semiconductors)[1])
 for (j in 1:length(unique.comment.positions)) {
    footnotemark[unique.comment.positions[[j]]] <- j
+   # # replace footnotemark numbers with symbols
+   # footnotesymbol <- c("\\ast", "\\dag", "\\ddag", "\\S", "\\P")
+   # for (m in 1:max(footnotemark, na.rm = T)) {
+   #    footnotemark[which(footnotemark == m)] <- footnotesymbol[m]
+   # }
 }
 
 ## ----'tab-semiconductors-asis', results='asis'------------------------------------
@@ -116,7 +121,9 @@ xtab.semiconductors <-
    xtable()
 caption(xtab.semiconductors) <-
    paste("Band edge levels at the pH of ZPC for each material.",
-         "All band edge potentials vs SHE.")
+         "All band edge potentials vs SHE at the given pH for each semiconductor.",
+         "The point of zero surface charge for each material is given (where available)",
+         "in the column labelled $\\mathrm{pH_{ZPC}}$.")
 label(xtab.semiconductors) <- "tab:semiconductors-asis"
 names(xtab.semiconductors) <-
  c("{Formula}",
@@ -228,7 +235,9 @@ print(xtab.semiconductors,
 #     xtable()
 #  caption(xtab.semiconductors) <-
 #     paste("Band edge levels at the pH of ZPC for each material.",
-#           "All band edge potentials vs SHE.")
+#           "All band edge potentials vs SHE at the given pH for each semiconductor.",
+#           "The point of zero surface charge for each material is given (where available)",
+#           "in the column labelled $\\mathrm{pH_{ZPC}}$.")
 #  label(xtab.semiconductors) <- "tab:semiconductors-asis"
 #  names(xtab.semiconductors) <-
 #   c("{Formula}",

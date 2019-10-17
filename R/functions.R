@@ -1,7 +1,7 @@
 #' Collect semiconductor properties into df row ready to add to dataset
 #'
-#' IMPORTANT: always specify CB/VB potentials vs SHE.
-#' May I suggest you use \code{\link[common]{as.SHE}} for this purpose.
+#' IMPORTANT: always use SHE scale for all potentials.
+#' May I suggest you use \code{\link[refelectrodes]{as.SHE}} for this purpose.
 #'
 #' @param formula mandatory. The compound's chemical formula.
 #' @param polymorph optional. Polymorph name, e.g., anatase, brookite.
@@ -14,7 +14,8 @@
 #' @param transition optional, transition type: direct, indirect, etc.
 #' @param pH optional, but recommended, allowed to be NA. The pH value at the CB/VB.
 #' @param pH.ZPC optional. pH at which surface charge is neutral.
-#' @param ref mandatory. BibTeX reference string.
+#' @param Nernstian optional. Is set to TRUE if given explicitly, else set to FALSE. Except if class is oxide then set to TRUE regardless.
+#' @param ref mandatory. BibTeX reference string. Separate multiple refs with commas.
 #' @param comment optional.
 #'
 #' @return single-row dataframe ready to be incorporated into a semiconductors dataframe
@@ -22,7 +23,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' semiconductor_row(formula="CdS", CB=common::as.SHE(-3.98, "AVS"), Eg=2.40, pH=2.00, ref="Xu2000")
+#' semiconductor_row(formula="CdS", CB=refelectrodes::as.SHE(-3.98, "AVS"),
+#'                   Eg=2.40, pH=2.00, ref="Xu2000")
 #' }
 semiconductor_row <-
    function (formula,
@@ -36,12 +38,29 @@ semiconductor_row <-
              transition = "",
              pH = NA,
              pH.ZPC = NA,
+             Nernstian = "",
              ref,
              comment = "") {
-      # check state of arguments for problems
+      ### Check state of arguments for problems
       # 1. check that CB/VB are numeric -- not implemented yet
       # 2. Check that formula makes sense chemically(?) -- not implemented yet
-      # 3. any other necessary checks... -- not implemented yet
+      # 3. other checks...
+
+      # 3 ## handle Nernstian arg
+      if (class == "oxide") Nernstian <- TRUE
+      # reset string "TRUE" to boolean TRUE
+      if (Nernstian == TRUE || Nernstian == "TRUE" || Nernstian == "true" || Nernstian == "True") {
+         Nernstian <- TRUE
+      } else {
+         # any other input should be considered Nernstian = FALSE
+         Nernstian <- FALSE
+      }
+
+      # 3 ## handle multiple references gracefully
+      if (length(ref) > 1) {
+         # collapse string and separate with commas
+         ref <- paste(ref, collapse = ",", sep = "")
+      }
 
       # Given any to of: CB, VB, Eg, calculate the third
       if (!is.na(CB)) {
@@ -91,6 +110,7 @@ semiconductor_row <-
                     transition = transition,
                     pH         = pH,
                     pH.ZPC     = pH.ZPC,
+                    Nernstian  = Nernstian,
                     ref        = ref,
                     comment    = comment,
                     stringsAsFactors = FALSE)
@@ -99,3 +119,10 @@ semiconductor_row <-
 
       return(scrow)
    }
+
+
+
+
+
+
+

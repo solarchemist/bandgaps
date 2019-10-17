@@ -1,0 +1,582 @@
+%\VignetteIndexEntry{Plots of Band Edges and Band Gaps}
+%\VignetteEngine{knitr::knitr}
+%\VignetteKeyword{LaTeX}
+%\VignetteKeyword{bandgaps}
+%\VignetteKeyword{semiconductors}
+
+
+\documentclass[a4paper]{article}
+
+% ----------------------------------------------------------------------
+% Page layout
+% ----------------------------------------------------------------------
+\usepackage[%
+   left=1.5cm,
+   right=1.5cm,
+   top=1.785cm,
+   bottom=2.0cm]%
+{geometry}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% bibliography
+% ----------------------------------------------------------------------
+\usepackage[%
+   backend=biber,
+   url=false,
+   doi=true]%
+{biblatex}
+% add DOIs in reference list
+\newcommand*\doiformat[1]{\small#1}
+\DeclareFieldFormat{doi}{%
+   \mkbibacro{\small{DOI}}\addcolon\space
+   \ifhyperref{%
+      \href{https://dx.doi.org/#1}{\doiformat{#1}}%
+   }{%
+      \doiformat{#1}%
+   }%
+}
+\addbibresource{references.bib}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Fonts and symbols
+% ----------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{textcomp} % \textdegree, \textmu, \texttrademark
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - general
+% ----------------------------------------------------------------------
+\usepackage{gitinfo2}
+% \usepackage{fancyhdr}
+%    \pagestyle{fancy}
+\usepackage{csquotes}
+% used by setstretch{} later in the preamble
+\usepackage{setspace}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - graphics, captions, footnotes, etc.
+% ----------------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage[%
+   format=plain,
+   justification=justified,
+   singlelinecheck=false,
+   font={stretch=1.125,small},
+   labelfont=bf,
+   labelsep=space]%
+{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+   \usetikzlibrary{arrows,calc,decorations.pathmorphing,shapes,backgrounds}
+\usepackage{pdflscape}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - tables, lists
+% ----------------------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage[inline]{enumitem} % control layout of lists
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Support packages - chemistry, science
+% ----------------------------------------------------------------------
+\usepackage{amssymb} %\geqslant, %\leqslant
+\usepackage{chemformula}
+   \setchemformula{charge-style=math}
+\usepackage{siunitx}
+   \sisetup{load-configurations=abbreviations,
+            separate-uncertainty,
+            detect-family,
+            range-phrase=\ensuremath{\text{ to }}}
+   \DeclareSIUnit{\counts}{cts}
+   \DeclareSIUnit{\cps}{cps}
+   \DeclareSIUnit{\molar}{\mole\per\cubic\deci\metre}
+   \DeclareSIUnit{\Molar}{\textsc{m}}
+   \DeclareSIUnit{\voltAgCl}{\volt(\ch{Ag}/\ch{AgCl})}
+   \DeclareSIUnit{\voltNHE}{\volt(NHE)}
+   \DeclareSIUnit{\voltSHE}{\volt(SHE)}
+   \DeclareSIUnit{\voltSCE}{\volt(SCE)}
+   \DeclareSIUnit{\voltLi}{\volt(\ch{Li}/\ch{Li+})}
+   \DeclareSIUnit{\rpm}{rpm}
+\usepackage{calc}
+\usepackage{xifthen}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Packages that need to be called last: hyperref, cleveref etc.
+% ----------------------------------------------------------------------
+\usepackage[%
+   pdfkeywords={Semiconductors Band gaps Conduction Band Valence Band Diagrams},%
+	pdfauthor={Collected by Taha Ahmed, Uppsala university},%
+	pdftitle={Plots of Band Edges and Band Gaps},%
+	pdfsubject={Photoelectrochemistry},%
+	pdftex]%
+{hyperref}
+\usepackage[nameinlink]{cleveref}
+% ----------------------------------------------------------------------
+
+\title{Visualisations of semiconductor \texttt{bandgaps} dataset}
+\date{\today}
+\author{Taha Ahmed}
+
+
+% ----------------------------------------------------------------------
+% R SETUP
+% ----------------------------------------------------------------------
+<<'R-setup', echo=F, results='hide', cache=FALSE>>=
+options(tikzDefaultEngine = "pdftex",
+        "tikzLatexPackages" =
+           c("\\usepackage{tikz}\n",
+             "\\usepackage[active,tightpage,psfixbb]{preview}\n",
+             "\\PreviewEnvironment{pgfpicture}\n",
+             "\\setlength\\PreviewBorder{0pt}\n",
+             "\\usepackage{chemformula}\n",
+             "\\setchemformula{charge-style=math}\n",
+             "\\usepackage{siunitx}\n",
+             "\\sisetup{load-configurations=abbreviations,separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+             "\\DeclareSIUnit{\\counts}{cts}\n",
+             "\\DeclareSIUnit{\\cps}{cps}\n",
+             "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
+             "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
+             "\\DeclareSIUnit{\\voltAgCl}{\\volt~vs.\\ \\ch{Ag}/\\ch{AgCl}}\n",
+             "\\DeclareSIUnit{\\voltNHE}{\\volt~vs.\\ NHE}\n",
+             "\\DeclareSIUnit{\\voltSHE}{\\volt~vs.\\ SHE}\n",
+             "\\DeclareSIUnit{\\voltSCE}{\\volt~vs.\\ SCE}\n",
+             "\\DeclareSIUnit{\\voltLi}{\\volt~vs.\\ \\ch{Li}/\\ch{Li+}}\n",
+             "\\DeclareSIUnit{\\rpm}{rpm}\n"),
+   digits   = 7,
+   width    = 84,
+   continue = "  ",
+   prompt   = "> ",
+   stringsAsFactors = FALSE)
+@
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% R LOAD PACKAGES
+% ----------------------------------------------------------------------
+<<'load-R-packages', echo=F, results='hide', message=FALSE>>=
+library(bandgaps)
+# packages listed below should also be listed in DESCRIPTION
+library(common)
+library(here)
+library(git2r)
+   repo <- repository(here())
+library(graphics)
+library(ggplot2)
+library(ggrepel)
+library(dplyr)
+library(tidyr)
+library(xtable)
+library(knitr)
+opts_knit$set(self.contained = FALSE,
+              child.path = '')
+opts_chunk$set(dev = 'tikz',
+               # external = TRUE only takes effect when tikz is the ONLY dev option
+               external = TRUE,
+               cache = FALSE,
+               fig.width = 3.40, # 2.60,
+               # corresponding height based on golden ratio (1.618034):
+               # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
+               # W 5.51 ==> H 3.41
+               # W 7.48 ==> H 4.62 >> works better >> W 5.40, H 3.34
+               fig.height = 2.10, # 1.61,
+               out.width = '3.40in', # '2.60in',
+               fig.align = 'center',
+               # size affects all knitr output. We use it primarily
+               # to match knitr font size to figure captions
+               size = 'footnotesize',
+               echo = FALSE,
+               eval = TRUE,
+               results = 'hide',
+               message = FALSE,
+               tidy = FALSE)
+@
+% ----------------------------------------------------------------------
+
+
+% ----------------------------------------------------------------------
+% DEFINITIONS FOR TIKZ BANDGAPS PLOT
+% ----------------------------------------------------------------------
+% NOTE: from /media/bay/taha/chepec/archive/chetex-archive/band-energy-tikz/oxides-bandgaps-v3c.tex
+% define fontstyle for the TiKZ plot
+\newcommand{\fnstyle}{\rmfamily}
+%-- Set grid dimensions
+\newcommand{\gridxmin}{-1}
+\newcommand{\gridymin}{-6}
+\newcommand{\gridxmax}{19.5}
+\newcommand{\gridymax}{4}
+%-- Footnote symbol container command
+%\newcommand{\defaultpH}{7}
+\newcommand{\deviatingpH}{}
+%-- Set band gap and edge size and position
+\newcommand{\bgxstart}{1.8cm}% x-coordinate of left-most band gap
+\newcommand{\bgxincrement}{0.7cm}% horizontal increment between each band gap
+\newlength{\bgxpos}
+\setlength{\bgxpos}{\bgxstart}
+\newlength{\bgedgewidth}
+\setlength{\bgedgewidth}{-0.20cm}% horizontal width of band edges
+%-- Set energy unit
+\newcommand{\eunit}{eV}
+%-- Define SHE axis parameters
+\newcommand{\SHExpos}{1}%
+\newcommand{\SHExunit}{cm}%
+\newcommand{\SHEpu}{\SHExpos\SHExunit}
+\newcommand{\SHEaxistitle}{$\emph{E}_\mathrm{SHE}$ (V)}
+%-- Define AVS axis parameters
+\newcommand{\AVSxpos}{18.5}
+\newcommand{\AVSxunit}{cm}%
+\newcommand{\AVSpu}{\AVSxpos\AVSxunit}
+\newcommand{\AVSaxistitle}{$\emph{E}_\mathrm{AVS}$ (V)}
+%-- Define SCE axis (currently not drawn)
+\newcommand{\SCExpos}{1}%
+\newcommand{\SCExunit}{cm}%
+\newcommand{\SCEpu}{\SCExpos\SCExunit}
+\newcommand{\SCEaxistitle}{$\emph{E}_\mathrm{SCE}$ (V)}
+
+% - SHE axis definition
+\newcommand{\SHEaxis}{%
+   \begin{scope}[style=thick,>=latex]
+   \draw[->] (\SHExpos,-5.25) -- coordinate (SHE axis)(\SHExpos,2.75);
+   \foreach \SHE/\SHEV in {-5.0/5.0,-4.5/4.5,-4/4.0,-3.5/3.5,-3.0/3.0,-2.5/2.5,-2.0/2.0,-1.5/1.5,-1.0/1.0,-0.5/0.5}
+      \draw (\SHEpu+4pt,\SHE cm) -- (\SHEpu+0pt,\SHE cm) node[xshift=0pt,anchor=east,font=\scriptsize\fnstyle] {\phantom{$-$}\SHEV};
+   % SHE zero level
+   \draw (\SHEpu+3pt,0cm) -- (\SHEpu-3pt,0cm) node[name=SHEzero,xshift=3pt,anchor=east,font=\scriptsize\fnstyle,fill=white] {\phantom{$-$}0\phantom{.0}};
+   \foreach \SHE/\SHEV in {0.5/0.5,1.0/1.0,1.5/1.5,2.0/2.0}
+      \draw (\SHEpu+4pt,\SHE cm) -- (\SHEpu+0pt,\SHE cm) node[xshift=0pt,anchor=east,font=\scriptsize\fnstyle] {$-$\SHEV};
+   \node[name=SHEaxistitle,font=\small\fnstyle,anchor=south] at (\SHEpu,3cm) {\SHEaxistitle};%yshift=3.5cm,
+   \end{scope}%
+}
+% - AVS axis definition
+\newcommand{\AVSaxis}{%
+   \begin{scope}[style=thick,>=latex]
+   % AVS axis from break-off to zero (vacuum)
+   \draw (\AVSpu+3pt,2.75cm) -- (\AVSpu-3pt,2.75cm) node[name=AVSzero,xshift=3pt,anchor=west,font=\scriptsize\fnstyle] {\phantom{$-$}0\phantom{.0}};
+   \draw (\AVSxpos,2.75) -- (\AVSxpos,2.48);
+   % Segment length needs to be adjusted in proportion to y scale factor. 2mm at scale=1.00
+   \draw[decorate,decoration={name=zigzag,segment length=2.4mm}] (\AVSxpos,2.48) -- (\AVSxpos,2.20);
+   \draw (\AVSxpos,2.20) -- (\AVSxpos,2.0);
+   % AVS axis up to -2.5 (break-off)
+   \draw[<-] (\AVSxpos,-5.5) -- coordinate(AVS axis) (\AVSxpos,2.0);
+   \foreach \AVS/\AVSV in {-5.0/9.5,-4.5/9.0,-4.0/8.5,-3.5/8.0,-3.0/7.5,-2.5/7.0,-2.0/6.5,-1.5/6.0,-1.0/5.5,-0.5/5.0,0/4.5}
+      \draw (\AVSpu-4pt,\AVS cm) -- (\AVSpu+0pt,\AVS cm) node[anchor=west,font=\scriptsize\fnstyle] {$-$\AVSV};
+   \foreach \AVS/\AVSV in {0.5/4.0,1.0/3.5,1.5/3.0,2.0/2.5}
+      \draw (\AVSpu-4pt,\AVS cm) -- (\AVSpu+0pt,\AVS cm) node[anchor=west,font=\scriptsize\fnstyle] {$-$\AVSV};
+   \node[name=AVSaxistitle,font=\small\fnstyle,anchor=south] at (\AVSpu,3cm) {\AVSaxistitle};%yshift=4cm,
+   \end{scope}%
+}
+% - SCE axis definition
+\newcommand{\SCEaxis}{%
+   \begin{scope}[style=thick,>=latex]
+   \draw[->] (\SCExpos,-4.25) -- coordinate (SCE axis)(\SCExpos,5.25);
+   \foreach \SCE/\SCEV in {0.26/0.5,0.76/1.0,1.26/1.5,1.76/2.0,2.26/2.5,2.76/3.0,3.26/3.5,3.76/4.0,4.26/4.5,4.76/5.0}
+      \draw (\SCEpu+4pt,\SCE cm) -- +(-4pt,0cm) node[anchor=east,font=\scriptsize\fnstyle] {$-$\SCEV};
+   % SCE zero level
+   \draw (\SCEpu+3pt,-0.24cm) -- +(-6pt,0cm) node[name=SCEzero,anchor=east,xshift=3pt,font=\scriptsize\fnstyle] {\phantom{$-$}\textbf{0}\phantom{.0}};
+   \foreach \SCE/\SCEV in {-0.74/0.5,-1.24/1.0,-1.74/1.5,-2.24/2.0,-2.74/2.5,-3.24/3.0,-3.74/3.5}
+      \draw (\SCEpu+4pt,\SCE cm) -- +(-4pt,0cm) node[anchor=east,font=\scriptsize\fnstyle] {\phantom{$-$}\SCEV};
+   \node[name=SCEaxistitle,font=\small\fnstyle,anchor=south] at (\SCEpu,3cm) {\SCEaxistitle};%yshift=4cm,
+   % AVS zero at SCE (-4.74)
+   \draw (\SCEpu+0pt,4.5cm) -- (\SCEpu+4pt,4.5cm) node[name=AVSzero@SCE,xshift=-2pt,anchor=west,font=\small\fnstyle] {$-$\textbf{4.74}};
+   \end{scope}%
+}
+% - Band gap drawing definition of shape and size
+\newcommand{\drawbg}[6]{%
+   % Argument 1: y coordinate of CB
+   % Argument 2: y coordinate of VB
+   % Argument 3: band gap
+   % Argument 4: fnsymbol
+   % Argument 5: title (name)
+   % Argument 6: secondary title
+   % - Check of pH argument
+   \ifthenelse{\isempty{#4}}{%
+      % No fnsymbol supplied
+      \renewcommand{\deviatingpH}{}
+   }{%
+      % fnsymbol supplied
+      \renewcommand{\deviatingpH}{$^{#4}$}
+   }
+   \begin{scope}[style=semithick]
+   \draw (\bgxpos,-#1cm) node(CB) {} (\bgxpos,-#2cm) node(VB) {};
+   % Specifying width of CB and VB shelves
+   \draw (CB) node[name=CB-shelf,xshift=\bgedgewidth] {};
+   \draw (VB) node[name=VB-shelf,xshift=\bgedgewidth] {};
+
+   % - Check for secondary title
+   \ifthenelse{\isempty{#6}}{%
+      % No secondary title - only primary
+		\draw[draw=white] (CB-shelf.west) --%
+		node[anchor=south,style=semithick,font=\scriptsize\fnstyle,fill=white,yshift=1pt,inner sep=1pt,scale=0.88]%0.82
+		{\ch{#5}\rlap{\deviatingpH}} (CB.east) -- %
+		node[anchor=south,style=semithick,font=\tiny\fnstyle,xshift=1pt,fill=white,scale=1.05,rotate=90]%
+		{$E_\mathrm{g}=#3$~\eunit} (VB.east) -- (VB-shelf.west);
+		%
+   }{%
+      % Both primary and secondary title wanted
+      \node[above of=CB,xshift=-0.10cm,yshift=-0.75cm,anchor=south,style=semithick,font=\scriptsize\fnstyle,inner sep=1pt,scale=0.88]%
+      {\ch{#5}\rlap{\deviatingpH}};
+      \draw[draw=white] (CB-shelf.west) -- node[anchor=south,style=semithick,font=\scriptsize\fnstyle,yshift=1pt,inner sep=1pt,scale=0.88]%
+		{#6} (CB.east) -- %
+		node[anchor=south,style=semithick,font=\tiny\fnstyle,xshift=1pt,fill=white,scale=1.05,rotate=90]%
+		{$E_\mathrm{g}=#3$~\eunit} (VB.east) -- (VB-shelf.west);
+   }
+   \draw (CB-shelf.west) -- (CB.east) -- (VB.east) -- (VB-shelf.west);
+   \end{scope}
+   \addtolength{\bgxpos}{\bgxincrement}
+}
+% - Definition of line at water reduction potential
+\newcommand{\SHEwaterhydrogen}{%
+   \draw[red,dashed] (\SHEpu-0.90cm,0cm) node[anchor=east,font=\scriptsize\fnstyle,inner sep=0pt] {\ch{H+}/\ch{H2}} -- (\AVSpu-3pt,0cm);
+}
+% - Definition of line at water oxidation potential
+\newcommand{\SHEwateroxygen}{%
+   \draw[blue,dashed] (\SHEpu-0.90cm,-1.23cm) node[anchor=east,font=\scriptsize\fnstyle,inner sep=0pt] {\ch{O2}/\ch{H2O}} -- (\AVSpu-0pt,-1.23cm);
+}
+% - Definition of footnotes inside figure area - MANUALLY
+\newcommand{\setnotes}{%
+	% start by defining a common reference point
+	\node[name=setnotesorigin] at (15,-4.6) {};
+	% then define two lines using the origin above
+	\node[name=setnotesfirst,anchor=south west] at (setnotesorigin.north east) {};
+	\node[name=setnotessecond,anchor=north west] at (setnotesorigin.south east) {};
+
+	% first line
+	\node[name=notetopleft,anchor=south west,style=semithick,font=\scriptsize\fnstyle,scale=0.82]%
+	at (setnotesfirst.south east)	{$^\ast$pH~1.7};
+	\node[name=notetopright,anchor=south west,style=semithick,font=\scriptsize\fnstyle,scale=0.82]%
+	at (notetopleft.south east) {$^\dag$pH~unknown};
+
+	% second line
+	\node[name=notebottomleft,anchor=south west,style=semithick,font=\scriptsize\fnstyle,scale=0.82]%
+	at (setnotessecond.south east) {$^\ddag$pH~14};
+	\node[name=notebottomright,anchor=south west,style=semithick,font=\scriptsize\fnstyle,scale=0.82]%
+	at (notetopright.south west |- notebottomleft.south east) {$^\S$pH~2};
+
+	% box or no box, that is the question...
+	\draw (notebottomleft.south west) rectangle (notetopright.north east);
+}
+% - Definition of title (mainly for debug use)
+\newcommand{\printtitle}[1]{%
+	\node[name=thisisthetitlem,anchor=center,font=\bfseries\fnstyle,xshift=-8.75cm]%(18.5-1)*0.5=8.75
+	at (AVSaxistitle.south west) {#1};
+}
+% ----------------------------------------------------------------------
+
+
+\setlength\parindent{0pt}
+\begin{document}
+\maketitle
+
+
+Here's my outline for a plotting function for the band gap plots:
+\begin{enumerate}
+\item User calls the function and specifies i) which materials, ii) at which pH (for all of them), and iii) which secondary scale to use (here we should leverage our \texttt{refelectrodes} package).
+\item Internally, the function should recalculate the CB and VB levels based on the supplied pH value, assuming the semiconductors follow Nernstian behaviour. I am not sure how to best handle non-Nernstian semiconductors in that case.
+\item Finally, the plot needs to figure out the correct scaling and direction of the secondary scale. This turns out to be pretty easy with \texttt{sec.axis} in ggplot2, but slightly more cumbersome with the base plot package.
+\end{enumerate}
+
+Not all of these points are implemented yet. In particular, a function that recalculates CB/VB levels based on pH assuming Nernstian behaviour has not been implemented yet. But other than that, the points above or mostly implemented in the base plot or ggplot plotting functions, which we will explore a little bit more below.
+
+
+
+
+\section*{Band gaps plotted with the base plot package}
+
+For the R base plot package, this package implements the function \verb+plot_bandgaps()+.
+The plot below can then be created with a single line of code, like this:
+
+<<ref.label='bandgaps-plot-figure', echo=TRUE, eval=FALSE>>=
+@
+
+\begin{center}\fbox{%
+<<'bandgaps-plot-figure', fig.width=6, fig.height=3.71, out.width='6in'>>=
+plot_bandgaps(bandgaps::semiconductors %>% filter(Nernstian == TRUE))
+@
+}\end{center}
+
+This works alright, with the plot size adapting fairly well to the number of included semiconductors, or to the absence of the secondary $y$-axis. The plot lacks a good way to handle placement and overlap of the labels, though.
+
+
+
+\clearpage
+\section*{Band gaps plotted with ggplot2}
+
+For expediency, since this is the first version of this vignette, I decided to represent the band gap with just a vertical line instead of the traditional horseshoe. (Could we define that as an object? Thus only needing to specify one edge and its length to draw it? Essentially creating a ggplot geom?)
+
+With a rather small effort we managed to have the labels for the highest CB edges below the VB instead of above the CB (to avoid overcrowding the top part of the plot). I also experimented with \texttt{ggrepel} for the labels, but found that using \verb+geom_text_repel()+ made the labels repel each other but not the line intervals themselves.
+
+So here's the band gaps dataset plotted using ggplot2:
+
+\begin{center}\fbox{%
+<<'bandgaps-ggplot-figure', fig.width=6, fig.height=3.71, out.width='6in'>>=
+ggplot_materials <-
+   bandgaps::semiconductors %>%
+   # for recalculation of pH, only display Nernstian semiconductors
+   filter(class == "oxide")
+ggplot_materials <-
+   ggplot_materials %>%
+   # add column with x variable
+   # NOTE: do this as the last step to avoid weird visual gaps
+   # 0.4 is the x-value of the first line, stepsize 1.0
+   mutate(x = seq(0.4, dim(ggplot_materials)[1], by = 1.0))
+ggplot(data = ggplot_materials) +
+   # water redox lines
+   geom_hline(yintercept = 0.00, colour = "red", linetype = "dashed", size = 0.3) +
+   geom_hline(yintercept = 1.23, colour = "blue", linetype = "dashed", size = 0.3) +
+   # band gaps visualised as vertical lines
+   geom_linerange(aes(x = x, ymin = CB, ymax = VB),
+                  size = 0.8) +
+   # label each compound
+   geom_text(aes(x = x,
+                 label = paste0("\\ch{", formula, "}"),
+                 # can we put the label at VB if CB > than some value?
+                 # also add a constant space between CB/VB and label
+                 y = ifelse(CB > -0.5, CB - 0.05, VB + 0.05),
+                 # left-adjust labels at CB, and right-adjust labels at VB
+                 hjust = ifelse(CB > -0.5, 0, 1)),
+             size = 3,
+             vjust = 0.5,
+             angle = 80) +
+   # flip primary y-axis and create secondary AVS axis
+   scale_y_continuous(
+      name = "E(SHE)/V",
+      # make sure each unit step is marked
+      breaks = seq(-4, 6),
+      # expand() parameters are
+      # a multiplicative and an absolute expansion
+      # we add some space to make sure the labels of the largest Eg fits
+      expand = c(0, 0.65),
+      trans = "reverse",
+      sec.axis =
+         # note the initial minus sign
+         # which makes the AVS scale go positive up
+         sec_axis(~ -. + refelectrodes::as.SHE(0, scale = "AVS"),
+                  name = "E(AVS)/V")) +
+   # a more suitable theme
+   theme_classic() +
+   # completely remove the x-axis
+   theme(axis.text.x = element_blank(),
+         axis.title.x = element_blank(),
+         axis.line.x = element_blank(),
+         axis.ticks.x = element_blank())
+@
+}\end{center}
+
+And this code chunk was used to generate it (this should be functionalised!):
+
+<<ref.label='bandgaps-ggplot-figure', echo=TRUE, eval=FALSE>>=
+@
+
+
+
+\begin{landscape}
+\thispagestyle{empty}
+
+\section*{Band gaps plotted with TikZ}
+
+This is the original version of this plot and the dataset. In fact, this dataset started out as electrochemical potentials hard-coded in the TikZ code. But despite that lack of adaptability, the visual quality of the plot surpasses both the base plot and the gpplot above (perhaps not for much longer). In fact, a slightly modified version of this plot was published in \textcite[p.\ 7886]{Meyers2012} and \textcite[p.\ 397]{Zhu2015}.
+
+There is a lot of \LaTeX\ and TikZ code behind this plot (have a look at the source file for this vignette if you like).
+Nonetheless, I have managed to make the code slightly more useful by integrating the dataset into the TikZ code using a fairly compact chunk of R code.
+
+Still, the TikZ code is not really dynamic. For example, the primary and secondary $y$-axis scales are hard-coded in the TikZ code.
+For future development, I think it is more fruitful to work on the ggplot approach above rather than this TikZ approach.
+
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize\fnstyle, xscale=1.00, yscale=1.20, framed]%, transform shape]
+\begin{pgfonlayer}{background}
+	% - On the background layer (drawn behind all other objects)
+	% Support grid
+	%\draw[step=1.0cm,gray!20] (\gridxmin,\gridymin) grid (\gridxmax,\gridymax);
+	% Draw dotted line at zero SHE potential (assuming pH 1)
+	\SHEwaterhydrogen
+	%- Draw dotted line at +1.23 SHE potential (assuming pH 1)
+	\SHEwateroxygen
+\end{pgfonlayer}
+
+% Draw SHE axis
+\SHEaxis
+% Draw AVS axis
+\AVSaxis
+% Draw title
+%\printtitle{Should it have a title?}%
+
+<<'bandgaps-tikz', results='asis'>>=
+# this chunk is bit of a hack to tie together the TikZ code with the bandgaps dataset
+tikz_materials <-
+   bandgaps::semiconductors %>%
+   # exclude a few to make the TikZ plot fit (the TikZ plot dimensions are not set dynamically, that's something to do)
+   filter(!formula %in% c("CdSe", "MoS2", "PbS")) %>%
+   select(CB, VB, Eg, formula, polymorph) %>%
+   mutate(CB = paste0("\\drawbg{", prettyNum(CB))) %>%
+   # fnsymb column is empty since we only show oxides
+   # so we will hack together an empty column in the right place
+   mutate(Eg = paste(Eg, "\\phantom{1}")) %>%
+   separate(Eg, sep = " ", c("Eg", "fnsymb")) %>%
+   mutate(polymorph = paste0(polymorph, "}"))
+tikz_materials %>%
+   write.table(row.names = F,
+               col.names = F,
+               sep = "}  {",
+               quote = F)
+@
+
+%\setnotes
+\end{tikzpicture}
+\end{center}
+
+\end{landscape}
+
+
+
+\printbibliography
+
+
+
+
+\clearpage
+%%%%% TikZ box displaying commit history, R session info, and LaTeX version info
+\begin{tikzpicture}[remember picture, overlay]%
+\node (gitbox) at (current page.north east)
+   [xshift=-2cm, yshift=-2cm, text width=10cm, fill=blue!40, below left, font=\sffamily\small\color{white}]%
+{\raggedright\bfseries%
+Source: \texttt{\jobname.Rnw}\\%
+git refs: \texttt{\gitReferences}\\%
+git hash: \texttt{\gitHash}\\%
+git author: \gitAuthorName\\%
+author email: \gitAuthorEmail\\%
+commit date: \gitAuthorIsoDate\\%
+compile date: \Sexpr{Sys.time()}};%
+\node (gitRbox) at (gitbox.south west) [yshift=0.35cm, text width=10cm, below right, font=\sffamily\small]%
+{%
+<<'gitR-info', echo=FALSE, results='markup', cache=FALSE>>=
+status(repo)
+@
+};%
+\node (Rbox) at (gitRbox.south west) [fill=blue!20, text width=10cm, below right, font=\sffamily\small]%
+{%
+<<'R-session-info', echo=FALSE, results='asis', cache=FALSE>>=
+toLatex(sessionInfo(), locale=F)
+@
+};%
+\node (LaTeXbox) at (Rbox.south west) [yshift=-0.10cm, fill=blue!10, text width=10cm, below right, font=\sffamily\small]%
+{%
+<<'pdflatex-version', echo=FALSE, results='asis'>>=
+latex.version.text <- system(command = "pdflatex -version", intern = TRUE)
+# quick fixes: replace "\o" with "o", and remove all empty rows in latex.version.text
+cat(paste0("\\noindent\n", paste(sub("\\\\o", "o", latex.version.text[which(latex.version.text != "")]), collapse = "\\\\\n")))
+@
+};%
+\end{tikzpicture}%
+%%%%%
+
+
+\end{document}
+
