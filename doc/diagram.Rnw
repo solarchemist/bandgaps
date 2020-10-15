@@ -481,7 +481,7 @@ And this code chunk was used to generate it (this should be functionalised!):
 
 \section*{Band gaps plotted with TikZ}
 
-This is the original version of this plot and the dataset. In fact, this dataset started out as electrochemical potentials hard-coded in the TikZ code. But despite that lack of adaptability, the visual quality of the plot surpasses both the base plot and the gpplot above (perhaps not for much longer). In fact, a slightly modified version of this plot was published in \textcite[p.\ 7886]{Meyers2012} and \textcite[p.\ 397]{Zhu2015}.
+This is the original version of this plot and the dataset. In fact, this dataset started out as electrochemical potentials hard-coded in the TikZ code. But despite that lack of adaptability, the visual quality of the plot surpasses both the base plot and the gpplot above (perhaps not for much longer). In fact, a slightly modified version of this plot was published in \textcite{Zhu2012} and \textcite[p.\ 397]{Zhu2015}.
 
 There is a lot of \LaTeX\ and TikZ code behind this plot (have a look at the source file for this vignette if you like).
 Nonetheless, I have managed to make the code slightly more useful by integrating the dataset into the TikZ code using a fairly compact chunk of R code.

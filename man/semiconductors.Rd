@@ -4,7 +4,8 @@
 \name{semiconductors}
 \alias{semiconductors}
 \title{Band gaps and band edge potentials for semiconductors}
-\format{A data frame with 27 rows and 14 variables:
+\format{
+A data frame with 27 rows and 14 variables:
 \describe{
   \item{id}{label used for uniquely identifying each row}
   \item{formula}{The compound's chemical formula.}
@@ -21,7 +22,8 @@
   \item{Nernstian}{Does semiconductor obey Nernstian pH behaviour? Boolean.}
   \item{ref}{Bibtex reference key. See bib-file in /vignettes/references.bib}
   \item{comment}{Free-form comment.}
-}}
+}
+}
 \usage{
 semiconductors
 }

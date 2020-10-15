@@ -4,10 +4,22 @@
 \alias{semiconductor_row}
 \title{Collect semiconductor properties into df row ready to add to dataset}
 \usage{
-semiconductor_row(formula, polymorph = "", xtal.size = "bulk",
-  sctype = "", class = "", CB = NA, VB = NA, Eg = NA,
-  transition = "", pH = NA, pH.ZPC = NA, Nernstian = "", ref,
-  comment = "")
+semiconductor_row(
+  formula,
+  polymorph = "",
+  xtal.size = "bulk",
+  sctype = "",
+  class = "",
+  CB = NA,
+  VB = NA,
+  Eg = NA,
+  transition = "",
+  pH = NA,
+  pH.ZPC = NA,
+  Nernstian = "",
+  ref,
+  comment = ""
+)
 }
 \arguments{
 \item{formula}{mandatory. The compound's chemical formula.}
