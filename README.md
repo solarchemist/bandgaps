@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/125443865.svg)](https://zenodo.org/badge/latestdoi/125443865)
+
 # Band edge positions and band gaps for some semiconductors
 
 This R package contains an extensible dataset of band edge positions and band gaps of many 
