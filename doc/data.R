@@ -8,31 +8,44 @@ options(tikzDefaultEngine = "pdftex",
              "\\usepackage{chemformula}\n",
              "\\setchemformula{charge-style=math}\n",
              "\\usepackage{siunitx}\n",
-             "\\sisetup{load-configurations=abbreviations,separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+             "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
              "\\DeclareSIUnit{\\counts}{cts}\n",
              "\\DeclareSIUnit{\\cps}{cps}\n",
              "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
              "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
-             "\\DeclareSIUnit{\\voltAgCl}{\\volt~vs.\\ \\ce{Ag}/\\ce{AgCl}}\n",
-             "\\DeclareSIUnit{\\voltNHE}{\\volt~vs.\\ NHE}\n",
-             "\\DeclareSIUnit{\\voltSHE}{\\volt~vs.\\ SHE}\n",
-             "\\DeclareSIUnit{\\voltSCE}{\\volt~vs.\\ SCE}\n",
-             "\\DeclareSIUnit{\\voltLi}{\\volt~vs.\\ \\ch{Li}/\\ch{Li+}}\n",
-             "\\DeclareSIUnit{\\rpm}{rpm}\n"),
+             "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
+             "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
+             "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
+             "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
+             "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
+             "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
+             "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
+             "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
    digits   = 7,
    width    = 84,
    continue = "  ",
    prompt   = "> ",
    stringsAsFactors = FALSE)
+# Was getting this confusing error during devtools:check():
+#    > checking re-building of vignette outputs ... WARNING
+#   Error(s) in re-building vignettes:
+#     ...
+#   --- re-building ‘data.Rnw’ using knitr
+#   here() starts at /media/bay/taha/chepec/chetex/common/R/bandgaps.Rcheck/vign_test/bandgaps
+#   Quitting from lines 167-199 (data.Rnw) 
+#   Error: processing vignette 'data.Rnw' failed with diagnostics:
+#   The 'path' is not in a git repository
+#   --- failed re-building ‘data.Rnw’
+# here::i_am("vignettes/data.Rnw")
 
 ## ----'load-R-packages', echo=F, results='hide', message=FALSE---------------------
 library(bandgaps)
 library(refelectrodes)
 # packages listed below should also be listed in DESCRIPTION
-library(here)
+# library(here)
 library(common)
-library(git2r)
-   repo <- repository(here())
+# library(git2r)
+#    repo <- repository(here())
 library(dplyr)
 library(xtable)
 library(knitr)
@@ -317,7 +330,7 @@ print(xtab.semiconductors,
 #        math.style.negative = FALSE)
 
 ## ----'gitR-info', echo=FALSE, results='markup', cache=FALSE-----------------------
-status(repo)
+# status(repo)
 
 ## ----'R-session-info', echo=FALSE, results='asis', cache=FALSE--------------------
 toLatex(sessionInfo(), locale=F)

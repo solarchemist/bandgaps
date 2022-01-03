@@ -90,20 +90,22 @@
 \usepackage{chemformula}
    \setchemformula{charge-style=math}
 \usepackage{siunitx}
-   \sisetup{load-configurations=abbreviations,
-            separate-uncertainty,
+   \sisetup{separate-uncertainty,
             detect-family,
             range-phrase=\ensuremath{\text{ to }}}
    \DeclareSIUnit{\counts}{cts}
    \DeclareSIUnit{\cps}{cps}
    \DeclareSIUnit{\molar}{\mole\per\cubic\deci\metre}
    \DeclareSIUnit{\Molar}{\textsc{m}}
-   \DeclareSIUnit{\voltAgCl}{\volt(\ch{Ag}/\ch{AgCl})}
-   \DeclareSIUnit{\voltNHE}{\volt(NHE)}
-   \DeclareSIUnit{\voltSHE}{\volt(SHE)}
-   \DeclareSIUnit{\voltSCE}{\volt(SCE)}
-   \DeclareSIUnit{\voltLi}{\volt(\ch{Li}/\ch{Li+})}
-   \DeclareSIUnit{\rpm}{rpm}
+   % electrochemical scales need to defined in two steps (siunitx v3 not behaving like v2 for some reason)
+   \DeclareSIUnit{\vsAgCl}{vs~\ch{Ag}/\ch{AgCl}}
+   \DeclareSIUnit{\vsNHE}{vs~NHE}
+   \DeclareSIUnit{\vsSHE}{vs~SHE}
+   \DeclareSIUnit{\vsSCE}{vs~SCE}
+   \DeclareSIUnit{\voltAgCl}{\volt\vsAgCl}
+   \DeclareSIUnit{\voltNHE}{\volt\vsNHE}
+   \DeclareSIUnit{\voltSHE}{\volt\vsSHE}
+   \DeclareSIUnit{\voltSCE}{\volt\vsSCE}
 % ----------------------------------------------------------------------
 
 % ----------------------------------------------------------------------
@@ -137,22 +139,36 @@ options(tikzDefaultEngine = "pdftex",
              "\\usepackage{chemformula}\n",
              "\\setchemformula{charge-style=math}\n",
              "\\usepackage{siunitx}\n",
-             "\\sisetup{load-configurations=abbreviations,separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+             "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
              "\\DeclareSIUnit{\\counts}{cts}\n",
              "\\DeclareSIUnit{\\cps}{cps}\n",
              "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
              "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
-             "\\DeclareSIUnit{\\voltAgCl}{\\volt~vs.\\ \\ce{Ag}/\\ce{AgCl}}\n",
-             "\\DeclareSIUnit{\\voltNHE}{\\volt~vs.\\ NHE}\n",
-             "\\DeclareSIUnit{\\voltSHE}{\\volt~vs.\\ SHE}\n",
-             "\\DeclareSIUnit{\\voltSCE}{\\volt~vs.\\ SCE}\n",
-             "\\DeclareSIUnit{\\voltLi}{\\volt~vs.\\ \\ch{Li}/\\ch{Li+}}\n",
-             "\\DeclareSIUnit{\\rpm}{rpm}\n"),
+             "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
+             "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
+             "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
+             "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
+             "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
+             "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
+             "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
+             "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
    digits   = 7,
    width    = 84,
    continue = "  ",
    prompt   = "> ",
    stringsAsFactors = FALSE)
+# Was getting this confusing error during devtools:check() if library(here) was used (same for the other vignette).
+# Only fixed by not using library(here) anymore (adding here::i_am() had no effect):
+#    > checking re-building of vignette outputs ... WARNING
+#   Error(s) in re-building vignettes:
+#     ...
+#   --- re-building ‘data.Rnw’ using knitr
+#   here() starts at /media/bay/taha/chepec/chetex/common/R/bandgaps.Rcheck/vign_test/bandgaps
+#   Quitting from lines 167-199 (data.Rnw) 
+#   Error: processing vignette 'data.Rnw' failed with diagnostics:
+#   The 'path' is not in a git repository
+#   --- failed re-building ‘data.Rnw’
+# here::i_am("vignettes/data.Rnw")
 @
 % ----------------------------------------------------------------------
 
@@ -163,10 +179,10 @@ options(tikzDefaultEngine = "pdftex",
 library(bandgaps)
 library(refelectrodes)
 # packages listed below should also be listed in DESCRIPTION
-library(here)
+# library(here)
 library(common)
-library(git2r)
-   repo <- repository(here())
+# library(git2r)
+#    repo <- repository(here())
 library(dplyr)
 library(xtable)
 library(knitr)
@@ -395,7 +411,7 @@ compile date: \Sexpr{Sys.time()}};%
 \node (gitRbox) at (gitbox.south west) [yshift=0.35cm, text width=10cm, below right, font=\sffamily\small]%
 {%
 <<'gitR-info', echo=FALSE, results='markup', cache=FALSE>>=
-status(repo)
+# status(repo)
 @
 };%
 \node (Rbox) at (gitRbox.south west) [fill=blue!20, text width=10cm, below right, font=\sffamily\small]%

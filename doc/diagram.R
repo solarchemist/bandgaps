@@ -8,33 +8,36 @@ options(tikzDefaultEngine = "pdftex",
              "\\usepackage{chemformula}\n",
              "\\setchemformula{charge-style=math}\n",
              "\\usepackage{siunitx}\n",
-             "\\sisetup{load-configurations=abbreviations,separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+             "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
              "\\DeclareSIUnit{\\counts}{cts}\n",
              "\\DeclareSIUnit{\\cps}{cps}\n",
              "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
              "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
-             "\\DeclareSIUnit{\\voltAgCl}{\\volt~vs.\\ \\ch{Ag}/\\ch{AgCl}}\n",
-             "\\DeclareSIUnit{\\voltNHE}{\\volt~vs.\\ NHE}\n",
-             "\\DeclareSIUnit{\\voltSHE}{\\volt~vs.\\ SHE}\n",
-             "\\DeclareSIUnit{\\voltSCE}{\\volt~vs.\\ SCE}\n",
-             "\\DeclareSIUnit{\\voltLi}{\\volt~vs.\\ \\ch{Li}/\\ch{Li+}}\n",
-             "\\DeclareSIUnit{\\rpm}{rpm}\n"),
+             "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
+             "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
+             "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
+             "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
+             "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
+             "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
+             "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
+             "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
    digits   = 7,
    width    = 84,
    continue = "  ",
    prompt   = "> ",
    stringsAsFactors = FALSE)
+# here::i_am("vignettes/diagram.Rnw")
 
 ## ----'load-R-packages', echo=F, results='hide', message=FALSE---------------------
 library(bandgaps)
 # packages listed below should also be listed in DESCRIPTION
 library(common)
-library(here)
-library(git2r)
-   repo <- repository(here())
+# library(here)
+# library(git2r)
+#    repo <- repository(here())
 library(graphics)
 library(ggplot2)
-library(ggrepel)
+# library(ggrepel) # am I using it?
 library(dplyr)
 library(tidyr)
 library(xtable)
@@ -192,7 +195,7 @@ tikz_materials %>%
                quote = F)
 
 ## ----'gitR-info', echo=FALSE, results='markup', cache=FALSE-----------------------
-status(repo)
+# status(repo)
 
 ## ----'R-session-info', echo=FALSE, results='asis', cache=FALSE--------------------
 toLatex(sessionInfo(), locale=F)
