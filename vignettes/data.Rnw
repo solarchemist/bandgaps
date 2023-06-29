@@ -1,8 +1,12 @@
-%\VignetteIndexEntry{Absolute Band Energies and Band Gaps}
+%\VignetteIndexEntry{Rendering all semiconductor bandgaps as a LaTeX table}
 %\VignetteEngine{knitr::knitr}
 %\VignetteKeyword{LaTeX}
 %\VignetteKeyword{bandgaps}
 %\VignetteKeyword{semiconductors}
+%\VignetteKeyword{conduction band}
+%\VignetteKeyword{valence band}
+%\VignetteKeyword{dataset}
+%\VignetteKeyword{photoelectrochemistry}
 
 
 \documentclass[a4paper]{article}
@@ -14,18 +18,25 @@
    left=2.0cm,
    right=2.0cm,
    top=1.785cm,
-   bottom=2.0cm]%
-{geometry}
+   bottom=2.0cm]{geometry}
 % ----------------------------------------------------------------------
 
 % ----------------------------------------------------------------------
-% bibliography
+% Fonts and symbols
+% ----------------------------------------------------------------------
+% inputenc should be loaded before biblatex
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{textcomp} % \textdegree, \textmu, \texttrademark
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Bibliography
 % ----------------------------------------------------------------------
 \usepackage[%
    backend=biber,
    url=false,
-   doi=true]%
-{biblatex}
+   doi=true]{biblatex}
 % add DOIs in reference list
 \newcommand*\doiformat[1]{\small#1}
 \DeclareFieldFormat{doi}{%
@@ -37,14 +48,6 @@
    }%
 }
 \addbibresource{references.bib}
-% ----------------------------------------------------------------------
-
-% ----------------------------------------------------------------------
-% Fonts and symbols
-% ----------------------------------------------------------------------
-\usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{textcomp} % \textdegree, \textmu, \texttrademark
 % ----------------------------------------------------------------------
 
 % ----------------------------------------------------------------------
@@ -68,8 +71,7 @@
    singlelinecheck=false,
    font={stretch=1.125,small},
    labelfont=bf,
-   labelsep=space]%
-{caption}
+   labelsep=space]{caption}
 \usepackage{subcaption}
 \usepackage{tikz}
 % \usepackage{rotating} % rotate full-page floats
@@ -90,9 +92,10 @@
 \usepackage{chemformula}
    \setchemformula{charge-style=math}
 \usepackage{siunitx}
-   \sisetup{separate-uncertainty,
-            detect-family,
-            range-phrase=\ensuremath{\text{ to }}}
+   \sisetup{%
+      separate-uncertainty,
+      detect-family,
+      range-phrase=\ensuremath{\text{ to }}}
    \DeclareSIUnit{\counts}{cts}
    \DeclareSIUnit{\cps}{cps}
    \DeclareSIUnit{\molar}{\mole\per\cubic\deci\metre}
@@ -112,12 +115,11 @@
 % Packages that need to be called last: hyperref, cleveref etc.
 % ----------------------------------------------------------------------
 \usepackage[%
-   pdfkeywords={Semiconductors Band gaps Conduction Band Valence Band Data},%
-	pdfauthor={Collected by Taha Ahmed, Uppsala university},%
-	pdftitle={Absolute band energies and band gaps},%
-	pdfsubject={Photoelectrochemistry},%
-	pdftex]%
-{hyperref}
+   pdfkeywords={Semiconductors Band gaps Conduction Band Valence Band Dataset Photoelectrochemistry},%
+	pdfauthor={Taha Ahmed, Uppsala university},%
+	pdftitle={Rendering all semiconductor bandgaps as a LaTeX table},%
+	pdfsubject={Vignette},%
+	pdftex]{hyperref}
 \usepackage[nameinlink]{cleveref}
 % ----------------------------------------------------------------------
 
@@ -130,28 +132,29 @@
 % R SETUP
 % ----------------------------------------------------------------------
 <<'R-setup', echo=F, results='hide', cache=FALSE>>=
-options(tikzDefaultEngine = "pdftex",
-        "tikzLatexPackages" =
-           c("\\usepackage{tikz}\n",
-             "\\usepackage[active,tightpage,psfixbb]{preview}\n",
-             "\\PreviewEnvironment{pgfpicture}\n",
-             "\\setlength\\PreviewBorder{0pt}\n",
-             "\\usepackage{chemformula}\n",
-             "\\setchemformula{charge-style=math}\n",
-             "\\usepackage{siunitx}\n",
-             "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
-             "\\DeclareSIUnit{\\counts}{cts}\n",
-             "\\DeclareSIUnit{\\cps}{cps}\n",
-             "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
-             "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
-             "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
-             "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
-             "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
-             "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
-             "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
-             "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
-             "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
-             "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
+options(
+   tikzDefaultEngine = "pdftex",
+   "tikzLatexPackages" = c(
+      "\\usepackage{tikz}\n",
+      "\\usepackage[active,tightpage,psfixbb]{preview}\n",
+      "\\PreviewEnvironment{pgfpicture}\n",
+      "\\setlength\\PreviewBorder{0pt}\n",
+      "\\usepackage{chemformula}\n",
+      "\\setchemformula{charge-style=math}\n",
+      "\\usepackage{siunitx}\n",
+      "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+      "\\DeclareSIUnit{\\counts}{cts}\n",
+      "\\DeclareSIUnit{\\cps}{cps}\n",
+      "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
+      "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
+      "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
+      "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
+      "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
+      "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
+      "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
+      "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
+      "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
+      "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
    digits   = 7,
    width    = 84,
    continue = "  ",
@@ -164,7 +167,7 @@ options(tikzDefaultEngine = "pdftex",
 #     ...
 #   --- re-building ‘data.Rnw’ using knitr
 #   here() starts at /media/bay/taha/chepec/chetex/common/R/bandgaps.Rcheck/vign_test/bandgaps
-#   Quitting from lines 167-199 (data.Rnw) 
+#   Quitting from lines 167-199 (data.Rnw)
 #   Error: processing vignette 'data.Rnw' failed with diagnostics:
 #   The 'path' is not in a git repository
 #   --- failed re-building ‘data.Rnw’
@@ -186,28 +189,30 @@ library(common)
 library(dplyr)
 library(xtable)
 library(knitr)
-opts_knit$set(self.contained = FALSE,
-              child.path = '')
-opts_chunk$set(dev = 'tikz',
-               # external = TRUE only takes effect when tikz is the ONLY dev option
-               external = TRUE,
-               cache = FALSE,
-               fig.width = 3.40, # 2.60,
-               # corresponding height based on golden ratio (1.618034):
-               # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
-               # W 5.51 ==> H 3.41
-               # W 7.48 ==> H 4.62 >> works better >> W 5.40, H 3.34
-               fig.height = 2.10, # 1.61,
-               out.width = '3.40in', # '2.60in',
-               fig.align = 'center',
-               # size affects all knitr output. We use it primarily
-               # to match knitr font size to figure captions
-               size = 'footnotesize',
-               echo = FALSE,
-               eval = TRUE,
-               results = 'hide',
-               message = FALSE,
-               tidy = FALSE)
+opts_knit$set(
+   self.contained = FALSE,
+   child.path = '')
+opts_chunk$set(
+   dev = 'tikz',
+   # external = TRUE only takes effect when tikz is the ONLY dev option
+   external = TRUE,
+   cache = FALSE,
+   fig.width = 3.40, # 2.60,
+   # corresponding height based on golden ratio (1.618034):
+   # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
+   # W 5.51 ==> H 3.41
+   # W 7.48 ==> H 4.62 >> works better >> W 5.40, H 3.34
+   fig.height = 2.10, # 1.61,
+   out.width = '3.40in', # '2.60in',
+   fig.align = 'center',
+   # size affects all knitr output. We use it primarily
+   # to match knitr font size to figure captions
+   size = 'footnotesize',
+   echo = FALSE,
+   eval = TRUE,
+   results = 'hide',
+   message = FALSE,
+   tidy = FALSE)
 @
 % ----------------------------------------------------------------------
 
@@ -216,11 +221,17 @@ opts_chunk$set(dev = 'tikz',
 \begin{document}
 \maketitle
 
-This package presents the position (potential) of the valence and conduction band edges for several semiconductors in contact with an aqueous electrolyte as an R dataframe. The package was created mainly to make it easier to use and share this dataset (which is entirely based on primary literature sources).
-Apart from the included data, the package contains a number of auxiliary functions meant to i) add new data, ii) tabulate the data, and iii) plot the band edges visually.
+This package presents the position (potential) of the valence and conduction band edges
+for semiconductors in contact with an aqueous electrolyte as an R dataframe.
+The package was created mainly to make it easier to use and share this dataset
+(which is entirely based on primary literature sources).
+Apart from the included data, the package contains a number of auxiliary functions
+meant to i) add new data, ii) tabulate the data, and iii) plot the band edges visually.
 
-In this vignette we demonstrate how the included data (\texttt{bandgaps::semiconductors}) can be typeset using \LaTeX (see \cref{tab:semiconductors-asis}).
-To make the rendered table look pretty, we will compress some columns and display comments as tabular footnotes, but without removing any data from display.
+In this vignette we demonstrate how the included data (\texttt{bandgaps::semiconductors})
+can be typeset using \LaTeX (see \cref{tab:semiconductors-asis}).
+To make the rendered table look pretty, we will compress some columns and display
+comments as tabular footnotes, but without removing any data from display.
 
 <<'comments-to-footnotes'>>=
 comments <- unique(semiconductors$comment)
@@ -257,42 +268,51 @@ We will render the table using \texttt{xtable} (that chunk is shown at the end o
 <<'tab-semiconductors-asis', results='asis'>>=
 xtab.semiconductors <-
    semiconductors %>%
-   mutate(formula =
-             ifelse(semiconductors$polymorph == "",
-                    paste0(ifelse(semiconductors$sctype == "",
-                                  "",
-                                  paste0("$", semiconductors$sctype, "$-")),
-                           "\\ch{", semiconductors$formula, "}"),
-                    paste0(ifelse(semiconductors$sctype == "",
-                                  "",
-                                  paste0("$", semiconductors$sctype, "$-")),
-                           "\\ch{", semiconductors$formula, "} ", "(", semiconductors$polymorph, ")"))) %>%
-   mutate(pH =
-             ifelse(is.na(semiconductors$pH),
-                    "\\multicolumn{1}{c}{\\texttt{NA}}",
-                    semiconductors$pH)) %>%
-   mutate(pH.ZPC =
-             ifelse(is.na(semiconductors$pH.ZPC),
-                    "\\multicolumn{1}{c}{\\texttt{NA}}",
-                    semiconductors$pH.ZPC)) %>%
-   mutate(ref =
-             ifelse(semiconductors$ref == "",
-                    "",
-                    paste0("\\cite{", semiconductors$ref, "}"))) %>%
-   mutate(footnotemark =
-             ifelse(is.na(footnotemark),
-                    "",
-                    paste0("$^{", footnotemark, "}$"))) %>%
+   mutate(
+      formula = ifelse(
+         semiconductors$polymorph == "",
+         paste0(
+            ifelse(
+               semiconductors$sctype == "",
+               "",
+               paste0("$", semiconductors$sctype, "$-")),
+            "\\ch{", semiconductors$formula, "}"),
+         paste0(
+            ifelse(
+               semiconductors$sctype == "",
+               "",
+               paste0("$", semiconductors$sctype, "$-")),
+            "\\ch{", semiconductors$formula, "} ", "(", semiconductors$polymorph, ")"))) %>%
+   mutate(
+      pH = ifelse(
+         is.na(semiconductors$pH),
+         "\\multicolumn{1}{c}{\\texttt{NA}}",
+         semiconductors$pH)) %>%
+   mutate(
+      pH.ZPC = ifelse(
+         is.na(semiconductors$pH.ZPC),
+         "\\multicolumn{1}{c}{\\texttt{NA}}",
+         semiconductors$pH.ZPC)) %>%
+   mutate(
+      ref = ifelse(
+         semiconductors$ref == "",
+         "",
+         paste0("\\cite{", semiconductors$ref, "}"))) %>%
+   mutate(
+      footnotemark = ifelse(
+         is.na(footnotemark),
+         "",
+         paste0("$^{", footnotemark, "}$"))) %>%
    select(formula, class, CB, VB, Eg, pH, pH.ZPC, ref, footnotemark) %>%
    xtable()
-caption(xtab.semiconductors) <-
-   paste("Band edge levels at the pH of ZPC for each material.",
-         "All band edge potentials vs SHE at the given pH for each semiconductor.",
-         "The point of zero surface charge for each material is given (where available)",
-         "in the column labelled $\\mathrm{pH_{ZPC}}$.")
+caption(xtab.semiconductors) <- paste(
+   "Band edge levels at the pH of ZPC for each material.",
+   "All band edge potentials vs SHE at the given pH for each semiconductor.",
+   "The point of zero surface charge for each material is given (where available)",
+   "in the column labelled $\\mathrm{pH_{ZPC}}$.")
 label(xtab.semiconductors) <- "tab:semiconductors-asis"
-names(xtab.semiconductors) <-
- c("{Formula}",
+names(xtab.semiconductors) <- c(
+   "{Formula}",
    "{Class}",
    "{$E_\\text{CB}$/\\si{\\voltSHE}}",
    "{$E_\\text{VB}$/\\si{\\voltSHE}}",
@@ -301,8 +321,8 @@ names(xtab.semiconductors) <-
    "{pH$_\\text{ZPC}$}",
    "{Ref}",
    "{Note}")
-digits(xtab.semiconductors) <-
- c(0, #row.names
+digits(xtab.semiconductors) <- c(
+   0, #row.names
    0, #formula
    0, #class
    2, #CB
@@ -312,8 +332,8 @@ digits(xtab.semiconductors) <-
    2, #pH.ZPC
    0, #Refs
    0) #Notes
-display(xtab.semiconductors) <-
- c("s", #row.names
+display(xtab.semiconductors) <- c(
+   "s", #row.names
    "s", #formula
    "s", #class
    "f", #CB
@@ -323,42 +343,47 @@ display(xtab.semiconductors) <-
    "f", #pH.ZPC
    "s", #Refs
    "s") #Notes
-align(xtab.semiconductors) <-
- c("l",                    #row.names
+align(xtab.semiconductors) <- c(
+   "l",                    #row.names
    "l",                    #formula
    "l",                    #class
    "S[table-format=+1.2]", #CB
    "S[table-format=+1.2]", #VB
    "S[table-format=+1.2]", #Eg
-   "S[table-format=1.2]",  #pH
-   "S[table-format=1.2]",  #pH.ZPC
+   "S[table-format=2.2]",  #pH
+   "S[table-format=2.2]",  #pH.ZPC
    "c",                    #Refs
    "l")                    #Notes
 ## create-latex-footnotetexts
 footnotetext <- comments
 # add numbering to each footnote
 for (j in 1:length(comments)) {
-   footnotetext[j] <-
-      paste0("\\multicolumn{", dim(xtab.semiconductors)[2],
-             "}{l}{", "$^{", j, "}$ ", comments[j], "}",
-             ifelse(j == length(comments),
-                    "\n",
-                    "\\\\"))
+   footnotetext[j] <- paste0(
+      "\\multicolumn{", dim(xtab.semiconductors)[2],
+      "}{l}{", "$^{", j, "}$ ", comments[j], "}",
+      ifelse(
+         j == length(comments),
+         "\n",
+         "\\\\"))
 }
-print(xtab.semiconductors,
-      floating = TRUE,
-      floating.environment = "table",
-      table.placement = "tbp",
-      caption.placement = "top",
-      hline.after = NULL,
-      add.to.row = list(pos = list(-1,
-                                   0,
-                                   nrow(xtab.semiconductors),
-                                   nrow(xtab.semiconductors)),
-                        command = c("\\toprule\n",
-                                    "\\midrule\n",
-                                    "\\bottomrule\n",
-                                    paste(footnotetext, collapse = "\n"))),
+print(
+   xtab.semiconductors,
+   floating = TRUE,
+   floating.environment = "table",
+   table.placement = "tbp",
+   caption.placement = "top",
+   hline.after = NULL,
+   add.to.row = list(
+      pos = list(
+         -1,
+         0,
+         nrow(xtab.semiconductors),
+         nrow(xtab.semiconductors)),
+      command = c(
+         "\\toprule\n",
+         "\\midrule\n",
+         "\\bottomrule\n",
+         paste(footnotetext, collapse = "\n"))),
       include.rownames = FALSE,
       include.colnames = TRUE,
       type = "latex",
@@ -372,16 +397,22 @@ print(xtab.semiconductors,
 
 \section*{Nernstian pH dependence}
 
-For many semiconductors in aqueous solutions, \ch{H+} and \ch{OH-} are the dominant adsorbed species, and therefore the potential drop across the Helmholtz layer, $V_\text{H}$, and the flatband potential changes systematically with pH.
-The point of zero charge (PZP, also known as the potential of zero $\zeta$ potential, PZZP) is the pH at which the potential drop across the Helmoltz layer is zero. \cite{Nozik1978}
+For many semiconductors in aqueous solutions, \ch{H+} and \ch{OH-} are the dominant
+adsorbed species, and therefore the potential drop across the Helmholtz layer, $V_\text{H}$,
+and the flatband potential changes systematically with pH.
+The potential of zero $\zeta$ potential (PZZP, also known as the point of of zero charge, PZP)
+is the pH at which the potential drop across the Helmoltz layer is zero \cite{Nozik1978}.
 The change of $V_\text{H}$ with pH follows a straight-forward Nernstian relationship:
 \begin{equation}\label{eq:nernstian-pH}
 V_\text{H}/\si{\volt} = \SI{0.059}{\volt} (\text{pH}_\text{PZC} - \text{pH})
 \end{equation}
 
-I will assume that all oxides in this dataset obey this Nernstian pH dependence. As for sulfides, literature reports are conflicted on the matter, \cite{Nozik1978,Xu2000} so out of an abundance of caution we will treat all sulfides as non-Nernstian.
+I will assume that all oxides in this dataset obey this Nernstian pH dependence.
+As for sulfides, literature reports are conflicted on the matter, \cite{Nozik1978,Xu2000}
+so out of an abundance of caution we will treat all sulfides as non-Nernstian.
 In some cases, individual non-oxide semiconductors have been shown to follow Nernstian pH behaviour.
-To keep track of Nernstian (or not) behaviour for all semiconductors, we have added a variable \texttt{Nernstian} to the dataset which is set to either \texttt{TRUE} or \texttt{FALSE}.
+To keep track of Nernstian (or not) behaviour for all semiconductors, we have added
+a boolean variable \texttt{Nernstian} to the dataset (either \texttt{TRUE} or \texttt{FALSE}).
 
 
 \printbibliography

@@ -1,8 +1,12 @@
-%\VignetteIndexEntry{Plots of Band Edges and Band Gaps}
+%\VignetteIndexEntry{Visualisations of the bandgaps dataset}
 %\VignetteEngine{knitr::knitr}
 %\VignetteKeyword{LaTeX}
 %\VignetteKeyword{bandgaps}
 %\VignetteKeyword{semiconductors}
+%\VignetteKeyword{conduction band}
+%\VignetteKeyword{valence band}
+%\VignetteKeyword{photoelectrochemistry}
+%\VignetteKeyword{diagrams}
 
 
 \documentclass[a4paper]{article}
@@ -14,8 +18,16 @@
    left=1.5cm,
    right=1.5cm,
    top=1.785cm,
-   bottom=2.0cm]%
-{geometry}
+   bottom=2.0cm]{geometry}
+% ----------------------------------------------------------------------
+
+% ----------------------------------------------------------------------
+% Fonts and symbols
+% ----------------------------------------------------------------------
+% inputenc should be loaded before biblatex
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{textcomp} % \textdegree, \textmu, \texttrademark
 % ----------------------------------------------------------------------
 
 % ----------------------------------------------------------------------
@@ -24,8 +36,7 @@
 \usepackage[%
    backend=biber,
    url=false,
-   doi=true]%
-{biblatex}
+   doi=true]{biblatex}
 % add DOIs in reference list
 \newcommand*\doiformat[1]{\small#1}
 \DeclareFieldFormat{doi}{%
@@ -37,14 +48,6 @@
    }%
 }
 \addbibresource{references.bib}
-% ----------------------------------------------------------------------
-
-% ----------------------------------------------------------------------
-% Fonts and symbols
-% ----------------------------------------------------------------------
-\usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{textcomp} % \textdegree, \textmu, \texttrademark
 % ----------------------------------------------------------------------
 
 % ----------------------------------------------------------------------
@@ -68,8 +71,7 @@
    singlelinecheck=false,
    font={stretch=1.125,small},
    labelfont=bf,
-   labelsep=space]%
-{caption}
+   labelsep=space]{caption}
 \usepackage{subcaption}
 \usepackage{tikz}
    \usetikzlibrary{arrows,calc,decorations.pathmorphing,shapes,backgrounds}
@@ -91,9 +93,10 @@
 \usepackage{chemformula}
    \setchemformula{charge-style=math}
 \usepackage{siunitx}
-   \sisetup{separate-uncertainty,
-            detect-family,
-            range-phrase=\ensuremath{\text{ to }}}
+   \sisetup{%
+      separate-uncertainty,
+      detect-family,
+      range-phrase=\ensuremath{\text{ to }}}
    \DeclareSIUnit{\counts}{cts}
    \DeclareSIUnit{\cps}{cps}
    \DeclareSIUnit{\molar}{\mole\per\cubic\deci\metre}
@@ -115,16 +118,15 @@
 % Packages that need to be called last: hyperref, cleveref etc.
 % ----------------------------------------------------------------------
 \usepackage[%
-   pdfkeywords={Semiconductors Band gaps Conduction Band Valence Band Diagrams},%
-	pdfauthor={Collected by Taha Ahmed, Uppsala university},%
-	pdftitle={Plots of Band Edges and Band Gaps},%
-	pdfsubject={Photoelectrochemistry},%
-	pdftex]%
-{hyperref}
+   pdfkeywords={Semiconductors Band gaps Conduction Band Valence Band Photoelectrochemistry Diagrams},%
+	pdfauthor={Taha Ahmed, Uppsala university},%
+	pdftitle={Visualisations of the bandgaps dataset},%
+	pdfsubject={Vignette},%
+	pdftex]{hyperref}
 \usepackage[nameinlink]{cleveref}
 % ----------------------------------------------------------------------
 
-\title{Visualisations of semiconductor \texttt{bandgaps} dataset}
+\title{Visualisations of the \texttt{bandgaps} dataset}
 \date{\today}
 \author{Taha Ahmed}
 
@@ -133,28 +135,29 @@
 % R SETUP
 % ----------------------------------------------------------------------
 <<'R-setup', echo=F, results='hide', cache=FALSE>>=
-options(tikzDefaultEngine = "pdftex",
-        "tikzLatexPackages" =
-           c("\\usepackage{tikz}\n",
-             "\\usepackage[active,tightpage,psfixbb]{preview}\n",
-             "\\PreviewEnvironment{pgfpicture}\n",
-             "\\setlength\\PreviewBorder{0pt}\n",
-             "\\usepackage{chemformula}\n",
-             "\\setchemformula{charge-style=math}\n",
-             "\\usepackage{siunitx}\n",
-             "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
-             "\\DeclareSIUnit{\\counts}{cts}\n",
-             "\\DeclareSIUnit{\\cps}{cps}\n",
-             "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
-             "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
-             "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
-             "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
-             "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
-             "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
-             "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
-             "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
-             "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
-             "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
+options(
+   tikzDefaultEngine = "pdftex",
+   "tikzLatexPackages" = c(
+      "\\usepackage{tikz}\n",
+      "\\usepackage[active,tightpage,psfixbb]{preview}\n",
+      "\\PreviewEnvironment{pgfpicture}\n",
+      "\\setlength\\PreviewBorder{0pt}\n",
+      "\\usepackage{chemformula}\n",
+      "\\setchemformula{charge-style=math}\n",
+      "\\usepackage{siunitx}\n",
+      "\\sisetup{separate-uncertainty,detect-family,range-phrase=\\ensuremath{\\text{ to }}}\n",
+      "\\DeclareSIUnit{\\counts}{cts}\n",
+      "\\DeclareSIUnit{\\cps}{cps}\n",
+      "\\DeclareSIUnit{\\molar}{\\mole\\per\\cubic\\deci\\metre}\n",
+      "\\DeclareSIUnit{\\Molar}{\\textsc{m}}\n",
+      "\\DeclareSIUnit{\\vsAgCl}{vs~\\ch{Ag}/\\ch{AgCl}}",
+      "\\DeclareSIUnit{\\vsNHE}{vs~NHE}",
+      "\\DeclareSIUnit{\\vsSHE}{vs~SHE}",
+      "\\DeclareSIUnit{\\vsSCE}{vs~SCE}",
+      "\\DeclareSIUnit{\\voltAgCl}{\\volt\\vsAgCl}",
+      "\\DeclareSIUnit{\\voltNHE}{\\volt\\vsNHE}",
+      "\\DeclareSIUnit{\\voltSHE}{\\volt\\vsSHE}",
+      "\\DeclareSIUnit{\\voltSCE}{\\volt\\vsSCE}"),
    digits   = 7,
    width    = 84,
    continue = "  ",
@@ -181,28 +184,30 @@ library(dplyr)
 library(tidyr)
 library(xtable)
 library(knitr)
-opts_knit$set(self.contained = FALSE,
-              child.path = '')
-opts_chunk$set(dev = 'tikz',
-               # external = TRUE only takes effect when tikz is the ONLY dev option
-               external = TRUE,
-               cache = FALSE,
-               fig.width = 3.40, # 2.60,
-               # corresponding height based on golden ratio (1.618034):
-               # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
-               # W 5.51 ==> H 3.41
-               # W 7.48 ==> H 4.62 >> works better >> W 5.40, H 3.34
-               fig.height = 2.10, # 1.61,
-               out.width = '3.40in', # '2.60in',
-               fig.align = 'center',
-               # size affects all knitr output. We use it primarily
-               # to match knitr font size to figure captions
-               size = 'footnotesize',
-               echo = FALSE,
-               eval = TRUE,
-               results = 'hide',
-               message = FALSE,
-               tidy = FALSE)
+opts_knit$set(
+   self.contained = FALSE,
+   child.path = '')
+opts_chunk$set(
+   dev = 'tikz',
+   # external = TRUE only takes effect when tikz is the ONLY dev option
+   external = TRUE,
+   cache = FALSE,
+   fig.width = 3.40, # 2.60,
+   # corresponding height based on golden ratio (1.618034):
+   # W 3.54 ==> H 2.19 >> works better >> W 2.60, H 1.61
+   # W 5.51 ==> H 3.41
+   # W 7.48 ==> H 4.62 >> works better >> W 5.40, H 3.34
+   fig.height = 2.10, # 1.61,
+   out.width = '3.40in', # '2.60in',
+   fig.align = 'center',
+   # size affects all knitr output. We use it primarily
+   # to match knitr font size to figure captions
+   size = 'footnotesize',
+   echo = FALSE,
+   eval = TRUE,
+   results = 'hide',
+   message = FALSE,
+   tidy = FALSE)
 @
 % ----------------------------------------------------------------------
 
@@ -382,14 +387,21 @@ opts_chunk$set(dev = 'tikz',
 
 Here's my outline for a plotting function for the band gap plots:
 \begin{enumerate}
-\item User calls the function and specifies i) which materials, ii) at which pH (for all of them), and iii) which secondary scale to use (here we should leverage our \texttt{refelectrodes} package).
-\item Internally, the function should recalculate the CB and VB levels based on the supplied pH value, assuming the semiconductors follow Nernstian behaviour. I am not sure how to best handle non-Nernstian semiconductors in that case.
-\item Finally, the plot needs to figure out the correct scaling and direction of the secondary scale. This turns out to be pretty easy with \texttt{sec.axis} in ggplot2, but slightly more cumbersome with the base plot package.
+\item User calls the function and specifies i) which materials, ii) at which pH (for all of them),
+   and iii) which secondary scale to use (here we should leverage our \texttt{refelectrodes} package).
+\item Internally, the function should recalculate the CB and VB levels based on the supplied pH value,
+   assuming the semiconductors follow Nernstian behaviour. I am not sure how to best handle
+   non-Nernstian semiconductors in that case.
+\item Finally, the plot needs to figure out the correct scaling and direction of the secondary scale.
+   This turns out to be pretty easy with \texttt{sec.axis} in ggplot2, but slightly more cumbersome
+   with the base plot package.
 \end{enumerate}
 
-Not all of these points are implemented yet. In particular, a function that recalculates CB/VB levels based on pH assuming Nernstian behaviour has not been implemented yet. But other than that, the points above or mostly implemented in the base plot or ggplot plotting functions, which we will explore a little bit more below.
-
-
+Not all of these points are implemented yet. In particular, a function that
+recalculates CB/VB levels based on pH assuming Nernstian behaviour has not been
+implemented yet. But other than that, the points above or mostly implemented in
+the base plot or ggplot2 plotting functions, which we will explore a little bit
+more below.
 
 
 \section*{Band gaps plotted with the base plot package}
@@ -406,16 +418,25 @@ plot_bandgaps(bandgaps::semiconductors %>% filter(Nernstian == TRUE))
 @
 }\end{center}
 
-This works alright, with the plot size adapting fairly well to the number of included semiconductors, or to the absence of the secondary $y$-axis. The plot lacks a good way to handle placement and overlap of the labels, though.
+This works alright, with the plot size adapting fairly well to the number of
+included semiconductors, or to the absence of the secondary $y$-axis.
+The plot lacks a good way to handle placement and overlap of the labels, though.
 
 
 
 \clearpage
 \section*{Band gaps plotted with ggplot2}
 
-For expediency, since this is the first version of this vignette, I decided to represent the band gap with just a vertical line instead of the traditional horseshoe. (Could we define that as an object? Thus only needing to specify one edge and its length to draw it? Essentially creating a ggplot geom?)
+For expediency, since this is the first version of this vignette, I decided to
+represent the band gap with just a vertical line instead of the traditional horseshoe.
+(Could we define that as an object? Thus only needing to specify one edge and its
+length to draw it? Essentially creating a ggplot2 geom?)
 
-With a rather small effort we managed to have the labels for the highest CB edges below the VB instead of above the CB (to avoid overcrowding the top part of the plot). I also experimented with \texttt{ggrepel} for the labels, but found that using \verb+geom_text_repel()+ made the labels repel each other but not the line intervals themselves.
+With a rather small effort we managed to have the labels for the highest CB edges
+below the VB instead of above the CB (to avoid overcrowding the top part of the plot).
+I also experimented with \texttt{ggrepel} for the labels, but found that using
+\verb+geom_text_repel()+ made the labels repel each other but not
+the line intervals themselves.
 
 So here's the band gaps dataset plotted using ggplot2:
 
@@ -436,19 +457,22 @@ ggplot(data = ggplot_materials) +
    geom_hline(yintercept = 0.00, colour = "red", linetype = "dashed", size = 0.3) +
    geom_hline(yintercept = 1.23, colour = "blue", linetype = "dashed", size = 0.3) +
    # band gaps visualised as vertical lines
-   geom_linerange(aes(x = x, ymin = CB, ymax = VB),
-                  size = 0.8) +
+   geom_linerange(
+      aes(x = x, ymin = CB, ymax = VB),
+      size = 0.8) +
    # label each compound
-   geom_text(aes(x = x,
-                 label = paste0("\\ch{", formula, "}"),
-                 # can we put the label at VB if CB > than some value?
-                 # also add a constant space between CB/VB and label
-                 y = ifelse(CB > -0.5, CB - 0.05, VB + 0.05),
-                 # left-adjust labels at CB, and right-adjust labels at VB
-                 hjust = ifelse(CB > -0.5, 0, 1)),
-             size = 3,
-             vjust = 0.5,
-             angle = 80) +
+   geom_text(
+      aes(
+         x = x,
+         label = paste0("\\ch{", formula, "}"),
+         # can we put the label at VB if CB > than some value?
+         # also add a constant space between CB/VB and label
+         y = ifelse(CB > -0.5, CB - 0.05, VB + 0.05),
+         # left-adjust labels at CB, and right-adjust labels at VB
+         hjust = ifelse(CB > -0.5, 0, 1)),
+      size = 3,
+      vjust = 0.5,
+      angle = 80) +
    # flip primary y-axis and create secondary AVS axis
    scale_y_continuous(
       name = "E(SHE)/V",
@@ -462,15 +486,17 @@ ggplot(data = ggplot_materials) +
       sec.axis =
          # note the initial minus sign
          # which makes the AVS scale go positive up
-         sec_axis(~ -. + refelectrodes::as.SHE(0, scale = "AVS"),
-                  name = "E(AVS)/V")) +
+         sec_axis(
+            ~ -. + refelectrodes::as.SHE(0, scale = "AVS"),
+            name = "E(AVS)/V")) +
    # a more suitable theme
    theme_classic() +
    # completely remove the x-axis
-   theme(axis.text.x = element_blank(),
-         axis.title.x = element_blank(),
-         axis.line.x = element_blank(),
-         axis.ticks.x = element_blank())
+   theme(
+      axis.text.x = element_blank(),
+      axis.title.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank())
 @
 }\end{center}
 
@@ -486,13 +512,21 @@ And this code chunk was used to generate it (this should be functionalised!):
 
 \section*{Band gaps plotted with TikZ}
 
-This is the original version of this plot and the dataset. In fact, this dataset started out as electrochemical potentials hard-coded in the TikZ code. But despite that lack of adaptability, the visual quality of the plot surpasses both the base plot and the gpplot above (perhaps not for much longer). In fact, a slightly modified version of this plot was published in \textcite{Zhu2012} and \textcite[p.\ 397]{Zhu2015}.
+This is the original version of this plot and the dataset. In fact, this dataset
+started out as electrochemical potentials hard-coded in the TikZ code. But despite
+that lack of adaptability, the visual quality of the plot surpasses both the base plot
+and the ggplot2 above (perhaps not for much longer). In fact, a slightly modified
+version of this plot was published in \textcite{Zhu2012} and \textcite[p.\ 397]{Zhu2015}.
 
-There is a lot of \LaTeX\ and TikZ code behind this plot (have a look at the source file for this vignette if you like).
-Nonetheless, I have managed to make the code slightly more useful by integrating the dataset into the TikZ code using a fairly compact chunk of R code.
+There is a lot of \LaTeX\ and TikZ code behind this plot (have a look at the
+source file for this vignette if you like).
+Nonetheless, I have managed to make the code slightly more useful by integrating
+the dataset into the TikZ code using a fairly compact chunk of R code.
 
-Still, the TikZ code is not really dynamic. For example, the primary and secondary $y$-axis scales are hard-coded in the TikZ code.
-For future development, I think it is more fruitful to work on the ggplot approach above rather than this TikZ approach.
+Still, the TikZ code is not really dynamic. For example, the primary and secondary
+$y$-axis scales are hard-coded in the TikZ code.
+For future development, I think it is more fruitful to work on the ggplot2 approach
+above rather than this TikZ approach.
 
 \begin{center}
 \begin{tikzpicture}[font=\scriptsize\fnstyle, xscale=1.00, yscale=1.20, framed]%, transform shape]
@@ -526,11 +560,11 @@ tikz_materials <-
    mutate(Eg = paste(Eg, "\\phantom{1}")) %>%
    separate(Eg, sep = " ", c("Eg", "fnsymb")) %>%
    mutate(polymorph = paste0(polymorph, "}"))
-tikz_materials %>%
-   write.table(row.names = F,
-               col.names = F,
-               sep = "}  {",
-               quote = F)
+tikz_materials %>% write.table(
+   row.names = F,
+   col.names = F,
+   sep = "}  {",
+   quote = F)
 @
 
 %\setnotes
@@ -584,4 +618,3 @@ cat(paste0("\\noindent\n", paste(sub("\\\\o", "o", latex.version.text[which(late
 
 
 \end{document}
-

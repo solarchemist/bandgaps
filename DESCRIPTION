@@ -1,24 +1,24 @@
 Package: bandgaps
 Type: Package
-Title: Band Energies of Some Semiconductors
-Version: 0.1.0.9000
+Title: Band Gaps and Edges for Some Semiconductors
+Description: A dataset of absolute band gaps and band edges for some semiconductors.
+Version: 0.1.1.9000
 Author: Taha Ahmed <taha@chepec.se>
 Maintainer: Taha Ahmed <taha@chepec.se>
-Suggests: 
+VignetteBuilder: knitr
+Depends: R (>= 2.10)
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.1
+Imports:
+   common,
+   refelectrodes,
+   graphics,
+   dplyr
+Suggests:
    knitr,
    xtable,
    git2r,
    ggplot2,
    tidyr
-VignetteBuilder: knitr
-Description: Absolute band energies and band gaps for some semiconductors.
-Depends: R (>= 2.10)
-License: GPL-3 + file LICENSE
-Encoding: UTF-8
-LazyData: true
-Imports: 
-   common,
-   refelectrodes,
-   graphics,
-   dplyr
-RoxygenNote: 7.1.1

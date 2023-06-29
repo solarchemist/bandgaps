@@ -7,10 +7,10 @@ cff-version: 1.2.0
 message: 'To cite package "bandgaps" in publications, please use the metadata from this file'
 type: dataset
 license: GPL-3.0-or-later
-title: 'Band Energies of Some Semiconductors'
-version: 0.1.0.9000
-year: 2020
-doi: https://doi.org/10.5281/zenodo.4099767
+title: 'The bandgaps package: band gaps and edges for some semiconductors'
+version: 0.1.1.9000
+year: 2023
+doi: https://doi.org/10.5281/zenodo.4099766
 abstract: This package provides a dataset of absolute band energies and band gaps for
   common oxide semiconductors and some other semiconductors, along with a few functions
   to manipulate and plot the band gaps using various methods, demonstrated in
